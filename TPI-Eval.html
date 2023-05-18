@@ -54,12 +54,21 @@
         background-color: lightgray;
         width: 95%;
         padding: 3px;
+        font-family: Calibri;
       }
       .points {
         width: 30px;
         border: none;
         background-color: lightgray;
         text-align: center;
+      }
+      #divGrade {
+        background-color: lightgray;
+      }
+      .value {
+        font-weight: bold;
+        padding: 4px;
+        text-align: left;
       }
       .center {
         text-align: center;
@@ -74,80 +83,99 @@
       tr:nth-child(even) {
         background-color: #f2f2f2;
       }
-
+      .button {
+        padding: 10px;
+        border-radius: 4px;
+        background-color: cornflowerblue;
+        text-align: center;
+        color: #f2f2f2;
+      }
       @media print {
         .pagebreak {
           page-break-before: always;
         } /* page-break-after works, as well */
+        .noprint {
+          display: none;
+        }
+      }
+
+      body {
+        font-family: Calibri;
       }
     </style>
   </head>
 
-  <body style="font-family: Calibri">
+  <body>
     <!-- ======================================================================================== -->
     <div id="divHeader">
       <p>Procédure de qualification : 88600/1/2/3 Informaticienne CFC/Informaticien CFC (Ordonnance 2014)</p>
-      <p>Formulaire d’évaluation Candidat/-e:</p>
+      <p>Formulaire d’évaluation Candidat/-e:<span class="value" id="spnCandidate"></span></p>
+      <hr />
     </div>
-
     <!-- ======================================================================================== -->
     <div id="divCartouche">
       <div class="table">
         <div class="row">
           <div class="cell col-6 bold">
-            Entreprise formatrice/Chef·fe de Projet: <br />
-            <input type="text" />
+            Entreprise formatrice/Chef·fe de Projet:
+            <div><input tabindex="1" id="txtBoss" type="text" /></div>
           </div>
           <div class="cell col-6 bold">
-            Candidat·e: <br />
-            <input type="text" />
+            Candidat·e:
+            <div><input tabindex="4" id="txtCandidate" type="text" /></div>
           </div>
         </div>
         <div class="row">
           <div class="cell col-6">
-            Téléphone: <br />
-            <input type="text" />
+            Téléphone:
+            <div><input tabindex="2" id="txtBossPhone" type="text" /></div>
           </div>
           <div class="cell col-6">
-            Téléphone: <br />
-            <input type="text" />
+            Téléphone:
+            <div><input tabindex="5" id="txtCandidatePhone" type="text" /></div>
           </div>
         </div>
         <div class="row">
           <div class="cell col-6">
-            Email: <br />
-            <input type="text" />
+            Email:
+            <div><input tabindex="3" id="txtBossMail" type="text" /></div>
           </div>
           <div class="cell col-6">
-            Email: <br />
-            <input type="text" />
+            Email:
+            <div><input tabindex="6" id="txtCandidateMail" type="text" /></div>
           </div>
         </div>
       </div>
       <br />
       <div class="table">
         <div class="row">
-          <div class="cell col-6 bold">Expert·e 1</div>
-          <div class="cell col-6 bold">Expert·e 2</div>
-        </div>
-        <div class="row">
-          <div class="cell col-6">
-            Téléphone: <br />
-            <input type="text" />
+          <div class="cell col-6 bold">
+            Expert·e 1
+            <div><input tabindex="7" id="txtExpert1" type="text" /></div>
           </div>
-          <div class="cell col-6">
-            Téléphone: <br />
-            <input type="text" />
+          <div class="cell col-6 bold">
+            Expert·e 2
+            <div><input tabindex="10" id="txtExpert2" type="text" /></div>
           </div>
         </div>
         <div class="row">
           <div class="cell col-6">
-            Email: <br />
-            <input type="text" />
+            Téléphone:
+            <div><input tabindex="8" id="txtExpert1Phone" type="text" /></div>
           </div>
           <div class="cell col-6">
-            Email: <br />
-            <input type="text" />
+            Téléphone:
+            <div><input tabindex="11" id="txtExpert2Phone" type="text" /></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="cell col-6">
+            Email:
+            <div><input tabindex="9" id="txtExpert1Mail" type="text" /></div>
+          </div>
+          <div class="cell col-6">
+            Email:
+            <div><input tabindex="12" id="txtExpert2Mail" type="text" /></div>
           </div>
         </div>
       </div>
@@ -395,7 +423,7 @@
     </div>
     <!-- ======================================================================================== -->
     <h2>Remarques</h2>
-    <textarea id="txtRemarks"></textarea>
+    <div><textarea tabindex="998" id="txtRemarks"></textarea></div>
     <div style="display: flex; flex-direction: column; margin: 25px">
       <div class="bold" style="display: flex; justify-content: space-around">
         <div style="font-style: italic">Signatures</div>
@@ -419,6 +447,8 @@
         <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
       </div>
     </div>
+    <!-- ======================================================================================== -->
+    <div id="cmdFreeze" class="button noprint">Finaliser</div>
   </body>
 
   <script>
@@ -655,11 +685,14 @@
         numcpts.min = 0;
         numcpts.max = 3;
         numcpts.id = "pts" + item.id;
+        numcpts.tabIndex = 999;
         cpts.appendChild(numcpts);
         let cjust = document.createElement("div");
+        cjust.id = "just" + item.id;
         cjust.className = "cell col-7 center";
-        let txtjust = document.createElement("input");
+        let txtjust = document.createElement("textarea");
         txtjust.type = "text";
+        txtjust.tabIndex = 999;
         cjust.appendChild(txtjust);
         r.appendChild(cid);
         r.appendChild(cname);
@@ -672,6 +705,8 @@
     // setup event handlers that will keep the grade accurate
     for (inputpoints of document.getElementsByClassName("points")) {
       inputpoints.addEventListener("change", function (e) {
+        if (e.target.value > 3) e.target.value = 3;
+        if (e.target.value < 0) e.target.value = 0;
         computeGrade();
       });
     }
@@ -702,6 +737,28 @@
       divTotal.innerText = total;
       let grade = (total / 120.0) * 5 + 1;
       divGrade.innerText = grade.toFixed(1);
+    }
+
+    // Finalize sheet by turning all inputs into their text value
+    cmdFreeze.addEventListener("click", function () {
+      spnCandidate.innerText = txtCandidate.value;
+      freezeInputs(document.getElementsByTagName("input"));
+      freezeInputs(document.getElementsByTagName("textarea"));
+      this.style.display = "none";
+    });
+
+    function freezeInputs(inputs) {
+      // Work backwards on the list because we are going to destroy the elements
+      for (i = inputs.length - 1; i >= 0; i--) {
+        let input = inputs[i];
+        let parent = input.parentNode;
+        let val = document.createElement("div");
+        val.className = "value";
+        if (input.type == "number") val.classList.add("center");
+        val.innerText = input.value;
+        parent.removeChild(input);
+        parent.appendChild(val);
+      }
     }
   </script>
 </html>
