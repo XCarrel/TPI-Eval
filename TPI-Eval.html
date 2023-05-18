@@ -178,7 +178,7 @@
     <!-- ======================================================================================== -->
 
     <h2 class="pagebreak">Partie A: Compétences professionnelles</h2>
-    <div id="tblProComp" class="table">
+    <div id="tblProComp" class="table" data-part="A">
       <div class="row">
         <div class="cell header col-1"></div>
         <div class="cell header col-7">Question</div>
@@ -189,7 +189,7 @@
     <!-- ======================================================================================== -->
 
     <h2 class="pagebreak">Partie B: Documentation / rapport du TPI</h2>
-    <div id="tblDoc" class="table">
+    <div id="tblDoc" class="table" data-part="B">
       <div class="row">
         <div class="cell header col-1"></div>
         <div class="cell header col-7">Question</div>
@@ -200,7 +200,7 @@
     <!-- ======================================================================================== -->
 
     <h2 class="pagebreak">Partie C: Entretien professionnel et présentation</h2>
-    <div id="tblPres" class="table">
+    <div id="tblPres" class="table" data-part="C">
       <div class="row">
         <div class="cell header col-1"></div>
         <div class="cell header col-7">Question</div>
@@ -220,26 +220,26 @@
       <div class="row">
         <div class="cell col-8">Partie A: Compétences professionnelles</div>
         <div class="cell col-2 center">60</div>
-        <div class="cell col-2 center"></div>
+        <div id="divTotalA" class="cell col-2 center"></div>
       </div>
       <div class="row">
         <div class="cell col-8">Partie B: Documentation / rapport du TPI</div>
         <div class="cell col-2 center">30</div>
-        <div class="cell col-2 center"></div>
+        <div id="divTotalB" class="cell col-2 center"></div>
       </div>
       <div class="row">
         <div class="cell col-8">Partie C: Entretien professionnel et présentation</div>
         <div class="cell col-2 center">30</div>
-        <div class="cell col-2 center"></div>
+        <div id="divTotalC" class="cell col-2 center"></div>
       </div>
       <div class="row bold">
         <div class="cell col-8">Somme de A + B + C</div>
         <div class="cell col-2 center">120</div>
-        <div class="cell col-2 center"></div>
+        <div id="divTotal" class="cell col-2 center"></div>
       </div>
       <div class="row bold">
         <div class="cell col-8">Note (5 * somme / 120) + 1</div>
-        <div class="cell col-2 center"></div>
+        <div id="divGrade" class="cell col-2 center"></div>
         <div class="cell col-2 center"></div>
       </div>
     </div>
@@ -527,7 +527,7 @@
 
     itemTable(competences, tblProComp);
 
-    var doccritieria = [
+    var documentation = [
       {
         id: "B1 ",
         title: "Résumé du rapport du TPI / version succincte de la doc.",
@@ -579,9 +579,9 @@
         help: "Les résultats des tests sont compréhensibles et reproductibles lorsque l'installation de test, les méthodes et les outils utilisés à cet effet sont décrits de telle manière que des spécialistes externes puissent exécuter eux-mêmes la procédure. Tous les tests, prévus ou imprévus, sont documentés.  \n \nNiveau de qualité 3  \n	1.	Le protocole de tests est basé sur l'équipement de test, les scénarios de tests et les moyens d'aide à disposition.   \n	2.	Il est facilement compréhensible.   \n	3.	Les actions et les paramètres sont décrits sans aucune ambiguité.   \n	4.	Tous les résultats des tests sont documentés.   \nNiveau de qualité 2  \nTrois des aspects sont bien remplis.  \n \nNiveau de qualité 1  \nDeux des aspects sont bien remplis.  \n \nNiveau de qualité 0  \nMoins de deux aspects sont bien remplis."
       }
     ];
-    itemTable(doccritieria, tblDoc);
+    itemTable(documentation, tblDoc);
 
-    var prescriteria = [
+    var presentation = [
       {
         id: "C1",
         title: "Gestion du temps, structure ",
@@ -633,8 +633,9 @@
         help: "Le candidat est-il apte à répondre à la question/l'ensemble des experts\nconcernant son travail de manière correcte et suffisamment professionnelle?\nL'étendue et le degré de finition du produit correspondent au temps investi.\n\nNiveau de qualité 3\nLes réponses aux questions traitent de tous les aspects de façon professionnelle et différenciée. Les déclarations faites sont, lorsque nécessaire, étayées par des exemples ou assorties de conclusions logiques. Les réponses sont correctes et reflètent les compétences techniques. Le ou la candidat-e peut aussi fournir des renseignements précis sur des détails. Il ou elle répond avec exactitude aux questions des experts, pose des questions si nécessaire et adopte un comportement correct\n\nNiveau de qualité 2\nLes réponses aux questions négligent un ou plusieurs aspects peu importants ou un aspect d'importance cruciale n'est pas suffisamment éclairci. La plupart des déclarations sont illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit principalement des réponses correctes et peut généralement répondre à des questions détaillées par des renseignements précis.\n\nNiveau de qualité 1\nLes réponses aux questions négligent un aspect de grande importance ou des aspects d'importance cruciale ne sont pas suffisamment éclaircis. Un grand nombre de déclarations ne sont pas illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit souvent des réponses erronées ou imprécises.\n\nNiveau de qualité 0\nLe candidat ne peut pas répondre correctement à la question/à l'ensemble de questions concernant son travail d'examen."
       }
     ];
-    itemTable(prescriteria, tblPres);
+    itemTable(presentation, tblPres);
 
+    // Build a table of criteria intoa given section div
     function itemTable(items, tablediv) {
       for (item of items) {
         let r = document.createElement("div");
@@ -653,6 +654,7 @@
         numcpts.type = "number";
         numcpts.min = 0;
         numcpts.max = 3;
+        numcpts.id = "pts" + item.id;
         cpts.appendChild(numcpts);
         let cjust = document.createElement("div");
         cjust.className = "cell col-7 center";
@@ -665,6 +667,41 @@
         r.appendChild(cjust);
         tablediv.appendChild(r);
       }
+    }
+
+    // setup event handlers that will keep the grade accurate
+    for (inputpoints of document.getElementsByClassName("points")) {
+      inputpoints.addEventListener("change", function (e) {
+        computeGrade();
+      });
+    }
+
+    // Compute and display the grades, doing sub totals per part
+    function computeGrade() {
+      let totalA = 0;
+      let totalB = 0;
+      let totalC = 0;
+      for (inputpoints of document.getElementsByClassName("points")) {
+        if (inputpoints.value > 0)
+          switch (inputpoints.parentNode.parentNode.parentNode.dataset.part) {
+            case "A":
+              totalA += parseInt(inputpoints.value);
+              break;
+            case "B":
+              totalB += parseInt(inputpoints.value);
+              break;
+            case "C":
+              totalC += parseInt(inputpoints.value);
+              break;
+          }
+      }
+      divTotalA.innerText = totalA;
+      divTotalB.innerText = totalB;
+      divTotalC.innerText = totalC;
+      let total = totalA + totalB + totalC;
+      divTotal.innerText = total;
+      let grade = (total / 120.0) * 5 + 1;
+      divGrade.innerText = grade.toFixed(1);
     }
   </script>
 </html>
