@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>TPI-Eval</title>
+    <script src="Eval TPI.js"></script>
     <style>
       .text {
         margin: 2px;
@@ -89,6 +90,8 @@
         background-color: cornflowerblue;
         text-align: center;
         color: #f2f2f2;
+        width: 70px;
+        margin: 3px;
       }
       @media print {
         .pagebreak {
@@ -448,7 +451,11 @@
       </div>
     </div>
     <!-- ======================================================================================== -->
-    <div id="cmdFreeze" class="button noprint">Finaliser</div>
+    <div class="row">
+      <div id="cmdFreeze" class="button noprint">Finaliser</div>
+      <div id="cmdSave" class="button noprint">Enregistrer</div>
+      <div id="cmdOpen" class="button noprint">Charger</div>
+    </div>
   </body>
 
   <script>
@@ -760,5 +767,39 @@
         parent.appendChild(val);
       }
     }
+
+    cmdOpen.addEventListener("click", function () {
+      txtBoss.value = data.cartouche.boss.name;
+      txtBossPhone.value = data.cartouche.boss.phone;
+      txtBossMail.value = data.cartouche.boss.mail;
+      txtCandidate.value = data.cartouche.candidate.name;
+      txtCandidatePhone.value = data.cartouche.candidate.phone;
+      txtCandidateMail.value = data.cartouche.candidate.mail;
+      txtExpert1.value = data.cartouche.expert1.name;
+      txtExpert1Phone.value = data.cartouche.expert1.phone;
+      txtExpert1Mail.value = data.cartouche.expert1.mail;
+      txtExpert2.value = data.cartouche.expert2.name;
+      txtExpert2Phone.value = data.cartouche.expert2.phone;
+      txtExpert2Mail.value = data.cartouche.expert2.mail;
+    });
+    cmdSave.addEventListener("click", function () {
+      data = {
+        frozen: cmdFreeze.style.display != "none",
+        cartouche: {
+          boss: { name: txtBoss.value, phone: txtBossPhone.value, mail: txtBossMail.value },
+          candidate: { name: txtCandidate.value, phone: txtCandidatePhone.value, mail: txtCandidateMail.value },
+          expert1: { name: txtExpert1.value, phone: txtExpert1Phone.value, mail: txtExpert1Mail.value },
+          expert2: { name: txtExpert2.value, phone: txtExpert2Phone.value, mail: txtExpert2Mail.value }
+        },
+        sections: []
+      };
+      var dataStr = "data:text/json;charset=utf-8, var data = " + encodeURIComponent(JSON.stringify(data));
+      var downloadAnchorNode = document.createElement("a");
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "Eval TPI " + txtCandidate.value + ".js");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    });
   </script>
 </html>
