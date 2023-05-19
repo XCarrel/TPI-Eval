@@ -748,11 +748,15 @@
 
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
+      freezeSheet();
+    });
+
+    function freezeSheet() {
       spnCandidate.innerText = txtCandidate.value;
       freezeInputs(document.getElementsByTagName("input"));
       freezeInputs(document.getElementsByTagName("textarea"));
       this.style.display = "none";
-    });
+    }
 
     function freezeInputs(inputs) {
       // Work backwards on the list because we are going to destroy the elements
@@ -790,6 +794,11 @@
         document.getElementById("just" + crit.id).value = crit.justification;
       }
       computeGrade();
+
+      // remarks
+      txtRemarks.value = data.remarks;
+
+      if (data.frozen) freezeSheet();
     }
 
     cmdSave.addEventListener("click", function () {
@@ -826,6 +835,9 @@
           justification: document.getElementById("just" + crit.id).value
         });
       }
+
+      // add remarks
+      data.remarks = txtRemarks.value;
 
       // and now save as downloaded json file
       var dataStr = "data:text/json;charset=utf-8, var data = " + encodeURIComponent(JSON.stringify(data));
