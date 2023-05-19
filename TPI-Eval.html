@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>TPI-Eval</title>
-    <script src="Eval TPI.js"></script>
+    <script src="Eval.js"></script>
     <style>
       .text {
         margin: 2px;
@@ -768,7 +768,8 @@
       }
     }
 
-    cmdOpen.addEventListener("click", function () {
+    // If saved data has been read, dispatch it into the fields
+    if (typeof data !== "undefined") {
       txtBoss.value = data.cartouche.boss.name;
       txtBossPhone.value = data.cartouche.boss.phone;
       txtBossMail.value = data.cartouche.boss.mail;
@@ -781,7 +782,8 @@
       txtExpert2.value = data.cartouche.expert2.name;
       txtExpert2Phone.value = data.cartouche.expert2.phone;
       txtExpert2Mail.value = data.cartouche.expert2.mail;
-    });
+    }
+
     cmdSave.addEventListener("click", function () {
       data = {
         frozen: cmdFreeze.style.display != "none",
