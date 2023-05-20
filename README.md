@@ -1,6 +1,6 @@
 # TPI Eval
 
-Une page HTML sans dépendance externe qui permet de remplir la grille d'évaluation des TPI
+Une page HTML sans dépendances externes qui permet de remplir la grille d'évaluation des TPI
 
 ### Pourquoi ?
 
