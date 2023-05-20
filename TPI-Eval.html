@@ -454,7 +454,6 @@
     <div class="row">
       <div id="cmdFreeze" class="button noprint">Finaliser</div>
       <div id="cmdSave" class="button noprint">Enregistrer</div>
-      <div id="cmdOpen" class="button noprint">Charger</div>
     </div>
   </body>
 
@@ -755,7 +754,8 @@
       spnCandidate.innerText = txtCandidate.value;
       freezeInputs(document.getElementsByTagName("input"));
       freezeInputs(document.getElementsByTagName("textarea"));
-      this.style.display = "none";
+      cmdFreeze.style.display = "none";
+      cmdSave.style.display = "none";
     }
 
     function freezeInputs(inputs) {
