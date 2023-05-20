@@ -89,7 +89,7 @@
         border-radius: 4px;
         background-color: cornflowerblue;
         text-align: center;
-        color: #f2f2f2;
+        color: white;
         width: 70px;
         margin: 3px;
       }
@@ -808,11 +808,13 @@
 
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
+      spnCandidate.innerText = txtCandidate.value;
+      cmdFreeze.style.display = "none"; // so the save function knows it's frozen
+      saveData();
       freezeSheet();
     });
 
     function freezeSheet() {
-      spnCandidate.innerText = txtCandidate.value;
       freezeInputs(document.getElementsByTagName("input"));
       freezeInputs(document.getElementsByTagName("textarea"));
       cmdFreeze.style.display = "none";
@@ -862,7 +864,15 @@
       if (data.frozen) freezeSheet();
     }
 
+    // Save content to file
+    // This is the major (if not only) trick : the content is downloaded as js code that loads json in a variable
+    // The script 'eval.js' is referenced in the header
+    // To resume work on a saved sheet, you must move the downloaded file to the html page's directory and name it 'eval.js'
     cmdSave.addEventListener("click", function () {
+      saveData();
+    });
+
+    function saveData() {
       data = {
         frozen: cmdFreeze.style.display == "none",
         cartouche: {
@@ -873,23 +883,9 @@
         }
       };
 
-      // build the sections part
+      // build the criteria part
       data.criteria = [];
-      for (crit of competences) {
-        data.criteria.push({
-          id: crit.id,
-          points: document.getElementById("pts" + crit.id).value,
-          justification: document.getElementById("just" + crit.id).value
-        });
-      }
-      for (crit of documentation) {
-        data.criteria.push({
-          id: crit.id,
-          points: document.getElementById("pts" + crit.id).value,
-          justification: document.getElementById("just" + crit.id).value
-        });
-      }
-      for (crit of presentation) {
+      for (crit of criteria) {
         data.criteria.push({
           id: crit.id,
           points: document.getElementById("pts" + crit.id).value,
@@ -908,7 +904,7 @@
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
-    });
+    }
 
     // Handling of modal popup, from w3schools
     // Get the modal
