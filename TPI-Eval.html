@@ -553,7 +553,7 @@
       {
         id: "A8",
         title: "Autonomie de travail",
-        help: "Le ou la candidat-e se procure et élabore les informations requises, cherche des variantes de solution et prend des décisions de façon compétente et professionnelle. Il ou elle répartit son travail et détermine ainsi le bon déroulement de son TPI.<br><h3>Niveau de qualité 3</h3><h3>Niveau de qualité 2</h3>Deux des points mentionnés sont remplis.<br><h3>Niveau de qualité 1</h3>Un des points est rempli ou les trois sont en partie remplis.<br><h3>Niveau de qualité 0</h3> Aucun des points n’est rempli. Ou le candidat ne demande aucune information ou aide supplémentaire, bien que cela aurait été nécessaire pour la progression et la réussite de son travail. "
+        help: "Le ou la candidat-e se procure et élabore les informations requises, cherche des variantes de solution et prend des décisions de façon compétente et professionnelle. Il ou elle répartit son travail et détermine ainsi le bon déroulement de son TPI.<br><h3>Niveau de qualité 3</h3>1. Sait distinguer l’essentiel du superflu et établir des priorités<br>2. Il utilise les moyens dont il dispose et arrive à les utiliser de manière autonome pour obtenir les informations nécessaires.<br>3. N’a besoin d’aucun soutien injustifié d’autres professionnels.<h3>Niveau de qualité 2</h3>Deux des points mentionnés sont remplis.<br><h3>Niveau de qualité 1</h3>Un des points est rempli ou les trois sont en partie remplis.<br><h3>Niveau de qualité 0</h3> Aucun des points n’est rempli. Ou le candidat ne demande aucune information ou aide supplémentaire, bien que cela aurait été nécessaire pour la progression et la réussite de son travail. "
       },
       {
         id: "A9",
@@ -573,7 +573,7 @@
       {
         id: "A12",
         title: "Organisation des résultats du travail ",
-        help: "Un classement des documents systématique et bien organisé permet d’exploiter au mieux les résultats du travail (documentation, code source, manuels, etc.). Afin de pouvoir accéder en tout temps aux résultats, le ou la candidat-e organise et sauvegarde ses documents. Une organisation correcte se reflétera ensuite dans la documentation.<br><h3>Niveau de qualité 3</h3>1. La gestion des versions des résultats du travail est correcte et reflète bien l’état de développement et permet de retrouver chaque version précédente.<br>2. L’organisation des documents permet de retrouver et de disposer de chaque version différente.<br>3. Les résultats du travail (documentation, code, manuels, etc.) sont enregistrés au moins une fois par jour.<br>4. La restauration des documents enregistrée est assurée.<br>5. L’ergonomie de la place de travail (physique et informatique) a été prise en compte. Elle est mise en place en fonction des besoins tout au long du TPI.<br>6. Les points<br><br>1.à 5 sont tous décrits et retraçables dans le rapport du TPI.<br><h3>Niveau de qualité 2</h3>Cinq des points mentionnés sont remplis.<br><h3>Niveau de qualité 1</h3>Quatre des points mentionnés sont remplis.<br><h3>Niveau de qualité 0</h3> Trois points mentionnés ou moins sont remplis. "
+        help: "Un classement des documents systématique et bien organisé permet d’exploiter au mieux les résultats du travail (documentation, code source, manuels, etc.). Afin de pouvoir accéder en tout temps aux résultats, le ou la candidat-e organise et sauvegarde ses documents. Une organisation correcte se reflétera ensuite dans la documentation.<br><h3>Niveau de qualité 3</h3>1. La gestion des versions des résultats du travail est correcte et reflète bien l’état de développement et permet de retrouver chaque version précédente.<br>2. L’organisation des documents permet de retrouver et de disposer de chaque version différente.<br>3. Les résultats du travail (documentation, code, manuels, etc.) sont enregistrés au moins une fois par jour.<br>4. La restauration des documents enregistrée est assurée.<br>5. L’ergonomie de la place de travail (physique et informatique) a été prise en compte. Elle est mise en place en fonction des besoins tout au long du TPI.<br>6. Les points 1 à 5 sont tous décrits et retraçables dans le rapport du TPI.<br><h3>Niveau de qualité 2</h3>Cinq des points mentionnés sont remplis.<br><h3>Niveau de qualité 1</h3>Quatre des points mentionnés sont remplis.<br><h3>Niveau de qualité 0</h3> Trois points mentionnés ou moins sont remplis. "
       },
       {
         id: "A13",
@@ -736,6 +736,25 @@
       let cname = document.createElement("div");
       cname.className = "cell col-7";
       cname.innerText = item.title;
+
+      // Add text input for specific criteria
+      if (item.id >= "A14" && item.id <= "A20") {
+        let desccrit = document.createElement("input");
+        desccrit.type = "text";
+        desccrit.id = "critspec" + item.id;
+        desccrit.tabIndex = tabindex++;
+        cname.appendChild(desccrit);
+      }
+
+      // Add text input for the question
+      if (item.id.charAt(0) == "C" && parseInt(item.id.substring(1)) >= 5 && parseInt(item.id.substring(1)) <= 10) {
+        let question = document.createElement("input");
+        question.type = "text";
+        question.id = "question" + item.id;
+        question.tabIndex = tabindex++;
+        cname.appendChild(question);
+      }
+
       let cpts = document.createElement("div");
       cpts.className = "cell col-1 center";
       let numcpts = document.createElement("input");
@@ -865,6 +884,11 @@
       }
       computeGrade();
 
+      // specifics
+      for (i = 14; i <= 20; i++) {
+        document.getElementById("critspecA" + i).value = data.specifics[i - 14];
+      }
+
       // remarks
       txtRemarks.value = data.remarks;
 
@@ -898,6 +922,18 @@
           points: document.getElementById("pts" + crit.id).value,
           justification: document.getElementById("just" + crit.id).value
         });
+      }
+
+      // specific criteria
+      data.specifics = [];
+      for (i = 14; i <= 20; i++) {
+        data.specifics.push(document.getElementById("critspecA" + i).value);
+      }
+
+      // questions
+      data.questions = [];
+      for (i = 5; i <= 10; i++) {
+        data.questions.push(document.getElementById("questionC" + i).value);
       }
 
       // add remarks
