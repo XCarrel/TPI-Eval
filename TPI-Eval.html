@@ -832,9 +832,18 @@
       divGrade.innerText = grade.toFixed(1);
     }
 
+    // propagate the candidate name in the sheet and workspace
+    function contextualize() {
+      spnCandidate.innerText = txtCandidate.value;
+      document.title = txtCandidate.value;
+    }
+    //
+    txtCandidate.addEventListener("change", function () {
+      contextualize();
+    });
+
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
-      spnCandidate.innerText = txtCandidate.value;
       cmdFreeze.style.display = "none"; // so the save function knows it's frozen
       saveData();
       freezeSheet();
@@ -893,6 +902,8 @@
       txtRemarks.value = data.remarks;
 
       if (data.frozen) freezeSheet();
+
+      contextualize();
     }
 
     // Save content to file
