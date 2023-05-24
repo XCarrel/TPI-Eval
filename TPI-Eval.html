@@ -168,6 +168,12 @@
   </head>
 
   <body>
+    Reprendre une évaluation existante
+    <select id="dpdEvalSelector">
+      <option value="0">--- Choisir ---</option>
+    </select>
+    ou
+    <button>Page blanche</button>
     <!-- ======================================================================================== -->
     <div id="divHeader">
       <p>Procédure de qualification : 88600/1/2/3 Informaticienne CFC/Informaticien CFC (Ordonnance 2014)</p>
@@ -728,7 +734,7 @@
         help: "Le candidat est-il apte à répondre à la question/l'ensemble des experts<br>concernant son travail de manière correcte et suffisamment professionnelle?<br>L'étendue et le degré de finition du produit correspondent au temps investi.<br><h3>Niveau de qualité 3</h3>Les réponses aux questions traitent de tous les aspects de façon professionnelle et différenciée. Les déclarations faites sont, lorsque nécessaire, étayées par des exemples ou assorties de conclusions logiques. Les réponses sont correctes et reflètent les compétences techniques. Le ou la candidat-e peut aussi fournir des renseignements précis sur des détails. Il ou elle répond avec exactitude aux questions des experts, pose des questions si nécessaire et adopte un comportement correct<br><h3>Niveau de qualité 2</h3>Les réponses aux questions négligent un ou plusieurs aspects peu importants ou un aspect d'importance cruciale n'est pas suffisamment éclairci. La plupart des déclarations sont illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit principalement des réponses correctes et peut généralement répondre à des questions détaillées par des renseignements précis.<br><h3>Niveau de qualité 1</h3>Les réponses aux questions négligent un aspect de grande importance ou des aspects d'importance cruciale ne sont pas suffisamment éclaircis. Un grand nombre de déclarations ne sont pas illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit souvent des réponses erronées ou imprécises.<br><h3>Niveau de qualité 0</h3>Le candidat ne peut pas répondre correctement à la question/à l'ensemble de questions concernant son travail d'examen."
       }
     ];
-    let tabindex = 20;
+    let tabindex = 20; // Leave some room for header fields
 
     // Build the tables
     for (item of criteria) {
