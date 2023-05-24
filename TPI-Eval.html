@@ -886,7 +886,7 @@
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
       cmdFreeze.style.display = "none"; // so the save function knows it's frozen
-      saveData();
+      saveData(true);
       freezeSheet();
     });
 
@@ -957,12 +957,12 @@
     // The script 'eval.js' is referenced in the header
     // To resume work on a saved sheet, you must move the downloaded file to the html page's directory and name it 'eval.js'
     cmdSave.addEventListener("click", function () {
-      saveData();
+      saveData(false);
     });
 
-    function saveData() {
+    function saveData(final) {
       data = {
-        frozen: cmdFreeze.style.display == "none",
+        frozen: final,
         cartouche: {
           boss: { name: txtBoss.value, phone: txtBossPhone.value, mail: txtBossMail.value },
           candidate: { name: txtCandidate.value, phone: txtCandidatePhone.value, mail: txtCandidateMail.value },
@@ -996,11 +996,23 @@
       // add remarks
       data.remarks = txtRemarks.value;
 
+      // determine the file name
+      let filename = "Eval - unknown.js";
+      if (final) {
+        filename = "Eval TPI " + txtCandidate.value + ".js";
+      } else {
+        if (dpdEvalSelector.value >= 0) {
+          filename = "eval" + (parseInt(dpdEvalSelector.value) + 1) + ".js";
+        } else {
+          filename = "eval" + (evals.length + 1) + ".js";
+        }
+      }
+
       // and now save as downloaded json file
-      var dataStr = "data:text/json;charset=utf-8, var data = " + encodeURIComponent(JSON.stringify(data));
+      var dataStr = "data:text/json;charset=utf-8, evals.push(" + encodeURIComponent(JSON.stringify(data)) + ")";
       var downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", "Eval TPI " + txtCandidate.value + ".js");
+      downloadAnchorNode.setAttribute("download", filename);
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
