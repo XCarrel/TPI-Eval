@@ -876,6 +876,7 @@
     dpdEvalSelector.addEventListener("change", function () {
       divSelector.className = "d-none";
       divPage.classList.remove("d-none");
+      load(evals[dpdEvalSelector.value]);
     });
 
     cmdEmpty.addEventListener("click", function () {
@@ -910,8 +911,8 @@
       }
     }
 
-    // If saved data has been read, dispatch it into the fields
-    if (typeof data !== "undefined") {
+    // dispatch the data into the field
+    function load(data) {
       // cartouche
       txtBoss.value = data.cartouche.boss.name;
       txtBossPhone.value = data.cartouche.boss.phone;
