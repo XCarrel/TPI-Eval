@@ -6,7 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>TPI-Eval</title>
-    <script src="Eval.js"></script>
+    <script>
+      var evals = [];
+    </script>
+    <script src="eval1.js"></script>
+    <script src="eval2.js"></script>
+    <script src="eval3.js"></script>
+    <script src="eval4.js"></script>
+    <script src="eval5.js"></script>
+    <script src="eval6.js"></script>
+    <script src="eval7.js"></script>
+    <script src="eval8.js"></script>
+    <script src="eval9.js"></script>
+    <script src="eval10.js"></script>
     <style>
       .text {
         margin: 2px;
@@ -31,6 +43,9 @@
       }
       .col-8 {
         width: 66%;
+      }
+      .d-none {
+        display: none;
       }
       .cell {
         padding: 3px;
@@ -156,353 +171,362 @@
   </head>
 
   <body>
-    <!-- ======================================================================================== -->
-    <div id="divHeader">
-      <p>Procédure de qualification : 88600/1/2/3 Informaticienne CFC/Informaticien CFC (Ordonnance 2014)</p>
-      <p>Formulaire d’évaluation Candidat/-e:<span class="value" id="spnCandidate"></span></p>
-      <hr />
+    <div id="divSelector">
+      Reprendre une évaluation existante
+      <select id="dpdEvalSelector">
+        <option value="-1">--- Choisir ---</option>
+      </select>
+      ou
+      <button id="cmdEmpty">Page blanche</button>
     </div>
-    <!-- ======================================================================================== -->
-    <div id="divCartouche">
-      <div class="table">
-        <div class="row">
-          <div class="cell col-6 bold">
-            Entreprise formatrice/Chef·fe de Projet:
-            <div><input tabindex="1" id="txtBoss" type="text" /></div>
+    <div id="divPage" class="d-none">
+      <!-- ======================================================================================== -->
+      <div id="divHeader">
+        <p>Procédure de qualification : 88600/1/2/3 Informaticienne CFC/Informaticien CFC (Ordonnance 2014)</p>
+        <p>Formulaire d’évaluation Candidat/-e:<span class="value" id="spnCandidate"></span></p>
+        <hr />
+      </div>
+      <!-- ======================================================================================== -->
+      <div id="divCartouche">
+        <div class="table">
+          <div class="row">
+            <div class="cell col-6 bold">
+              Entreprise formatrice/Chef·fe de Projet:
+              <div><input tabindex="1" id="txtBoss" type="text" /></div>
+            </div>
+            <div class="cell col-6 bold">
+              Candidat·e:
+              <div><input tabindex="4" id="txtCandidate" type="text" /></div>
+            </div>
           </div>
-          <div class="cell col-6 bold">
-            Candidat·e:
-            <div><input tabindex="4" id="txtCandidate" type="text" /></div>
+          <div class="row">
+            <div class="cell col-6">
+              Téléphone:
+              <div><input tabindex="2" id="txtBossPhone" type="text" /></div>
+            </div>
+            <div class="cell col-6">
+              Téléphone:
+              <div><input tabindex="5" id="txtCandidatePhone" type="text" /></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell col-6">
+              Email:
+              <div><input tabindex="3" id="txtBossMail" type="text" /></div>
+            </div>
+            <div class="cell col-6">
+              Email:
+              <div><input tabindex="6" id="txtCandidateMail" type="text" /></div>
+            </div>
           </div>
         </div>
-        <div class="row">
-          <div class="cell col-6">
-            Téléphone:
-            <div><input tabindex="2" id="txtBossPhone" type="text" /></div>
+        <br />
+        <div class="table">
+          <div class="row">
+            <div class="cell col-6 bold">
+              Expert·e 1
+              <div><input tabindex="7" id="txtExpert1" type="text" /></div>
+            </div>
+            <div class="cell col-6 bold">
+              Expert·e 2
+              <div><input tabindex="10" id="txtExpert2" type="text" /></div>
+            </div>
           </div>
-          <div class="cell col-6">
-            Téléphone:
-            <div><input tabindex="5" id="txtCandidatePhone" type="text" /></div>
+          <div class="row">
+            <div class="cell col-6">
+              Téléphone:
+              <div><input tabindex="8" id="txtExpert1Phone" type="text" /></div>
+            </div>
+            <div class="cell col-6">
+              Téléphone:
+              <div><input tabindex="11" id="txtExpert2Phone" type="text" /></div>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="cell col-6">
-            Email:
-            <div><input tabindex="3" id="txtBossMail" type="text" /></div>
-          </div>
-          <div class="cell col-6">
-            Email:
-            <div><input tabindex="6" id="txtCandidateMail" type="text" /></div>
+          <div class="row">
+            <div class="cell col-6">
+              Email:
+              <div><input tabindex="9" id="txtExpert1Mail" type="text" /></div>
+            </div>
+            <div class="cell col-6">
+              Email:
+              <div><input tabindex="12" id="txtExpert2Mail" type="text" /></div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="text">
+        <p>Ce document ne doit en aucun cas être montré au candidat après l’attribution des points.</p>
+        <p class="bold">Conseils pour l’évaluation et l’attribution de la note</p>
+        <p class="bold">Documentation</p>
+        <p>
+          Les experts/expertes traitent tous les documents de manière confidentielle. La conservation des dossiers est
+          régie par le droit cantonal.
+        </p>
+        <p class="bold">Evaluation</p>
+        <p>
+          Le/la chef/-e de projet du TPI et les experts/expertes évaluent les compétences professionnelles élargies, le
+          résultat et les compétences professionnelles.
+        </p>
+        <p>L’évaluation du TPI est répartie comme suit :</p>
+        <p><span class="bold">Partie A:</span> Compétences professionnelles (20 critères)</p>
+        <ul>
+          <li>6 critères relatifs à l’analyse et au concept</li>
+          <li>7 critères relatifs à la réalisation, aux tests et au résultats du TPI</li>
+          <li>7 critères spécifiques à la tâche demandée par le supérieur professionnel</li>
+        </ul>
+        <p><span class="bold">Partie B:</span> Documentation / rapport du TPI (10 critères)</p>
+        <p><span class="bold">Partie C:</span> Entretien professionnel et présentation (10 critères)</p>
+      </div>
+      <!-- ======================================================================================== -->
+
+      <h2 class="pagebreak">Partie A: Compétences professionnelles</h2>
+      <div id="tblProComp" class="table" data-part="A">
+        <div class="row">
+          <div class="cell header col-1"></div>
+          <div class="cell header col-7">Question</div>
+          <div class="cell header col-1">Pt</div>
+          <div class="cell header col-7">Justification</div>
+        </div>
+      </div>
+      <!-- ======================================================================================== -->
+
+      <h2 class="pagebreak">Partie B: Documentation / rapport du TPI</h2>
+      <div id="tblDoc" class="table" data-part="B">
+        <div class="row">
+          <div class="cell header col-1"></div>
+          <div class="cell header col-7">Question</div>
+          <div class="cell header col-1">Pt</div>
+          <div class="cell header col-7">Justification</div>
+        </div>
+      </div>
+      <!-- ======================================================================================== -->
+
+      <h2 class="pagebreak">Partie C: Entretien professionnel et présentation</h2>
+      <div id="tblPres" class="table" data-part="C">
+        <div class="row">
+          <div class="cell header col-1"></div>
+          <div class="cell header col-7">Question</div>
+          <div class="cell header col-1">Pt</div>
+          <div class="cell header col-7">Justification</div>
+        </div>
+      </div>
+      <!-- ======================================================================================== -->
+
+      <h2 class="pagebreak">Contraction</h2>
+      <div class="table">
+        <div class="row">
+          <div class="cell col-8 bold">Sommes des différentes parties</div>
+          <div class="cell col-2 bold">Nombre de points max</div>
+          <div class="cell col-2 bold">Points obtenus</div>
+        </div>
+        <div class="row">
+          <div class="cell col-8">Partie A: Compétences professionnelles</div>
+          <div class="cell col-2 center">60</div>
+          <div id="divTotalA" class="cell col-2 center"></div>
+        </div>
+        <div class="row">
+          <div class="cell col-8">Partie B: Documentation / rapport du TPI</div>
+          <div class="cell col-2 center">30</div>
+          <div id="divTotalB" class="cell col-2 center"></div>
+        </div>
+        <div class="row">
+          <div class="cell col-8">Partie C: Entretien professionnel et présentation</div>
+          <div class="cell col-2 center">30</div>
+          <div id="divTotalC" class="cell col-2 center"></div>
+        </div>
+        <div class="row bold">
+          <div class="cell col-8">Somme de A + B + C</div>
+          <div class="cell col-2 center">120</div>
+          <div id="divTotal" class="cell col-2 center"></div>
+        </div>
+        <div class="row bold">
+          <div class="cell col-8">Note (5 * somme / 120) + 1</div>
+          <div id="divGrade" class="cell col-2 center"></div>
+          <div class="cell col-2 center"></div>
+        </div>
+      </div>
+      <!-- ======================================================================================== -->
       <br />
-      <div class="table">
-        <div class="row">
-          <div class="cell col-6 bold">
-            Expert·e 1
-            <div><input tabindex="7" id="txtExpert1" type="text" /></div>
+      <div class="center">
+        <table id="tblGrades" style="border-collapse: collapse">
+          <tr>
+            <th>Points</th>
+            <th>Note</th>
+            <th>Points</th>
+            <th>Note</th>
+            <th>Points</th>
+            <th>Note</th>
+            <th>Points</th>
+            <th>Note</th>
+            <th>Points</th>
+            <th>Note</th>
+          </tr>
+          <tr>
+            <td>0-1</td>
+            <td>1,0</td>
+            <td>23-25</td>
+            <td>2,0</td>
+            <td>47-49</td>
+            <td>3,0</td>
+            <td>71-73</td>
+            <td>4,0</td>
+            <td>95-97</td>
+            <td>5,0</td>
+          </tr>
+          <tr>
+            <td>2-3</td>
+            <td>1,1</td>
+            <td>26-27</td>
+            <td>2,1</td>
+            <td>50-51</td>
+            <td>3,1</td>
+            <td>74-75</td>
+            <td>4,1</td>
+            <td>98-99</td>
+            <td>5,1</td>
+          </tr>
+          <tr>
+            <td>4-5</td>
+            <td>1,2</td>
+            <td>28-29</td>
+            <td>2,2</td>
+            <td>52-53</td>
+            <td>3,2</td>
+            <td>76-77</td>
+            <td>4,2</td>
+            <td>100-101</td>
+            <td>5,2</td>
+          </tr>
+          <tr>
+            <td>6-8</td>
+            <td>1,3</td>
+            <td>30-32</td>
+            <td>2,3</td>
+            <td>54-56</td>
+            <td>3,3</td>
+            <td>78-80</td>
+            <td>4,3</td>
+            <td>102-104</td>
+            <td>5,3</td>
+          </tr>
+          <tr>
+            <td>9-10</td>
+            <td>1,4</td>
+            <td>33-34</td>
+            <td>2,4</td>
+            <td>57-58</td>
+            <td>3,4</td>
+            <td>81-82</td>
+            <td>4,4</td>
+            <td>105-106</td>
+            <td>5,4</td>
+          </tr>
+          <tr>
+            <td>11-13</td>
+            <td>1,5</td>
+            <td>35-37</td>
+            <td>2,5</td>
+            <td>59-61</td>
+            <td>3,5</td>
+            <td>83-85</td>
+            <td>4,5</td>
+            <td>107-109</td>
+            <td>5,5</td>
+          </tr>
+          <tr>
+            <td>14-15</td>
+            <td>1,6</td>
+            <td>38-39</td>
+            <td>2,6</td>
+            <td>62-63</td>
+            <td>3,6</td>
+            <td>86-87</td>
+            <td>4,6</td>
+            <td>110-111</td>
+            <td>5,6</td>
+          </tr>
+          <tr>
+            <td>16-17</td>
+            <td>1,7</td>
+            <td>40-41</td>
+            <td>2,7</td>
+            <td>64-65</td>
+            <td>3,7</td>
+            <td>88-89</td>
+            <td>4,7</td>
+            <td>112-113</td>
+            <td>5,7</td>
+          </tr>
+          <tr>
+            <td>18-20</td>
+            <td>1,8</td>
+            <td>42-44</td>
+            <td>2,8</td>
+            <td>66-68</td>
+            <td>3,8</td>
+            <td>90-92</td>
+            <td>4,8</td>
+            <td>114-116</td>
+            <td>5,8</td>
+          </tr>
+          <tr>
+            <td>21-22</td>
+            <td>1,9</td>
+            <td>45-46</td>
+            <td>2,9</td>
+            <td>69-70</td>
+            <td>3,9</td>
+            <td>93-94</td>
+            <td>4,9</td>
+            <td>117-118</td>
+            <td>5,9</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>119-120</td>
+            <td>6,0</td>
+          </tr>
+        </table>
+      </div>
+      <!-- ======================================================================================== -->
+      <h2>Remarques</h2>
+      <div><textarea tabindex="998" id="txtRemarks"></textarea></div>
+      <div style="display: flex; flex-direction: column; margin: 25px">
+        <div class="bold" style="display: flex; justify-content: space-around">
+          <div style="font-style: italic">Signatures</div>
+          <div>
+            Chef·fe de projet<br />
+            <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
           </div>
-          <div class="cell col-6 bold">
-            Expert·e 2
-            <div><input tabindex="10" id="txtExpert2" type="text" /></div>
+          <div>
+            Expert·e 1<br />
+            <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
+          </div>
+          <div>
+            Expert·e 2<br />
+            <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
           </div>
         </div>
-        <div class="row">
-          <div class="cell col-6">
-            Téléphone:
-            <div><input tabindex="8" id="txtExpert1Phone" type="text" /></div>
-          </div>
-          <div class="cell col-6">
-            Téléphone:
-            <div><input tabindex="11" id="txtExpert2Phone" type="text" /></div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="cell col-6">
-            Email:
-            <div><input tabindex="9" id="txtExpert1Mail" type="text" /></div>
-          </div>
-          <div class="cell col-6">
-            Email:
-            <div><input tabindex="12" id="txtExpert2Mail" type="text" /></div>
-          </div>
+        <div style="display: flex; justify-content: space-around">
+          <div style="height: 80px; width: 20%"></div>
+          <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
+          <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
+          <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
         </div>
       </div>
-    </div>
-    <div class="text">
-      <p>Ce document ne doit en aucun cas être montré au candidat après l’attribution des points.</p>
-      <p class="bold">Conseils pour l’évaluation et l’attribution de la note</p>
-      <p class="bold">Documentation</p>
-      <p>
-        Les experts/expertes traitent tous les documents de manière confidentielle. La conservation des dossiers est
-        régie par le droit cantonal.
-      </p>
-      <p class="bold">Evaluation</p>
-      <p>
-        Le/la chef/-e de projet du TPI et les experts/expertes évaluent les compétences professionnelles élargies, le
-        résultat et les compétences professionnelles.
-      </p>
-      <p>L’évaluation du TPI est répartie comme suit :</p>
-      <p><span class="bold">Partie A:</span> Compétences professionnelles (20 critères)</p>
-      <ul>
-        <li>6 critères relatifs à l’analyse et au concept</li>
-        <li>7 critères relatifs à la réalisation, aux tests et au résultats du TPI</li>
-        <li>7 critères spécifiques à la tâche demandée par le supérieur professionnel</li>
-      </ul>
-      <p><span class="bold">Partie B:</span> Documentation / rapport du TPI (10 critères)</p>
-      <p><span class="bold">Partie C:</span> Entretien professionnel et présentation (10 critères)</p>
-    </div>
-    <!-- ======================================================================================== -->
-
-    <h2 class="pagebreak">Partie A: Compétences professionnelles</h2>
-    <div id="tblProComp" class="table" data-part="A">
+      <!-- ======================================================================================== -->
       <div class="row">
-        <div class="cell header col-1"></div>
-        <div class="cell header col-7">Question</div>
-        <div class="cell header col-1">Pt</div>
-        <div class="cell header col-7">Justification</div>
+        <div id="cmdFreeze" class="button noprint">Finaliser</div>
+        <div id="cmdSave" class="button noprint">Enregistrer</div>
       </div>
     </div>
-    <!-- ======================================================================================== -->
-
-    <h2 class="pagebreak">Partie B: Documentation / rapport du TPI</h2>
-    <div id="tblDoc" class="table" data-part="B">
-      <div class="row">
-        <div class="cell header col-1"></div>
-        <div class="cell header col-7">Question</div>
-        <div class="cell header col-1">Pt</div>
-        <div class="cell header col-7">Justification</div>
-      </div>
-    </div>
-    <!-- ======================================================================================== -->
-
-    <h2 class="pagebreak">Partie C: Entretien professionnel et présentation</h2>
-    <div id="tblPres" class="table" data-part="C">
-      <div class="row">
-        <div class="cell header col-1"></div>
-        <div class="cell header col-7">Question</div>
-        <div class="cell header col-1">Pt</div>
-        <div class="cell header col-7">Justification</div>
-      </div>
-    </div>
-    <!-- ======================================================================================== -->
-
-    <h2 class="pagebreak">Contraction</h2>
-    <div class="table">
-      <div class="row">
-        <div class="cell col-8 bold">Sommes des différentes parties</div>
-        <div class="cell col-2 bold">Nombre de points max</div>
-        <div class="cell col-2 bold">Points obtenus</div>
-      </div>
-      <div class="row">
-        <div class="cell col-8">Partie A: Compétences professionnelles</div>
-        <div class="cell col-2 center">60</div>
-        <div id="divTotalA" class="cell col-2 center"></div>
-      </div>
-      <div class="row">
-        <div class="cell col-8">Partie B: Documentation / rapport du TPI</div>
-        <div class="cell col-2 center">30</div>
-        <div id="divTotalB" class="cell col-2 center"></div>
-      </div>
-      <div class="row">
-        <div class="cell col-8">Partie C: Entretien professionnel et présentation</div>
-        <div class="cell col-2 center">30</div>
-        <div id="divTotalC" class="cell col-2 center"></div>
-      </div>
-      <div class="row bold">
-        <div class="cell col-8">Somme de A + B + C</div>
-        <div class="cell col-2 center">120</div>
-        <div id="divTotal" class="cell col-2 center"></div>
-      </div>
-      <div class="row bold">
-        <div class="cell col-8">Note (5 * somme / 120) + 1</div>
-        <div id="divGrade" class="cell col-2 center"></div>
-        <div class="cell col-2 center"></div>
-      </div>
-    </div>
-    <!-- ======================================================================================== -->
-    <br />
-    <div class="center">
-      <table id="tblGrades" style="border-collapse: collapse">
-        <tr>
-          <th>Points</th>
-          <th>Note</th>
-          <th>Points</th>
-          <th>Note</th>
-          <th>Points</th>
-          <th>Note</th>
-          <th>Points</th>
-          <th>Note</th>
-          <th>Points</th>
-          <th>Note</th>
-        </tr>
-        <tr>
-          <td>0-1</td>
-          <td>1,0</td>
-          <td>23-25</td>
-          <td>2,0</td>
-          <td>47-49</td>
-          <td>3,0</td>
-          <td>71-73</td>
-          <td>4,0</td>
-          <td>95-97</td>
-          <td>5,0</td>
-        </tr>
-        <tr>
-          <td>2-3</td>
-          <td>1,1</td>
-          <td>26-27</td>
-          <td>2,1</td>
-          <td>50-51</td>
-          <td>3,1</td>
-          <td>74-75</td>
-          <td>4,1</td>
-          <td>98-99</td>
-          <td>5,1</td>
-        </tr>
-        <tr>
-          <td>4-5</td>
-          <td>1,2</td>
-          <td>28-29</td>
-          <td>2,2</td>
-          <td>52-53</td>
-          <td>3,2</td>
-          <td>76-77</td>
-          <td>4,2</td>
-          <td>100-101</td>
-          <td>5,2</td>
-        </tr>
-        <tr>
-          <td>6-8</td>
-          <td>1,3</td>
-          <td>30-32</td>
-          <td>2,3</td>
-          <td>54-56</td>
-          <td>3,3</td>
-          <td>78-80</td>
-          <td>4,3</td>
-          <td>102-104</td>
-          <td>5,3</td>
-        </tr>
-        <tr>
-          <td>9-10</td>
-          <td>1,4</td>
-          <td>33-34</td>
-          <td>2,4</td>
-          <td>57-58</td>
-          <td>3,4</td>
-          <td>81-82</td>
-          <td>4,4</td>
-          <td>105-106</td>
-          <td>5,4</td>
-        </tr>
-        <tr>
-          <td>11-13</td>
-          <td>1,5</td>
-          <td>35-37</td>
-          <td>2,5</td>
-          <td>59-61</td>
-          <td>3,5</td>
-          <td>83-85</td>
-          <td>4,5</td>
-          <td>107-109</td>
-          <td>5,5</td>
-        </tr>
-        <tr>
-          <td>14-15</td>
-          <td>1,6</td>
-          <td>38-39</td>
-          <td>2,6</td>
-          <td>62-63</td>
-          <td>3,6</td>
-          <td>86-87</td>
-          <td>4,6</td>
-          <td>110-111</td>
-          <td>5,6</td>
-        </tr>
-        <tr>
-          <td>16-17</td>
-          <td>1,7</td>
-          <td>40-41</td>
-          <td>2,7</td>
-          <td>64-65</td>
-          <td>3,7</td>
-          <td>88-89</td>
-          <td>4,7</td>
-          <td>112-113</td>
-          <td>5,7</td>
-        </tr>
-        <tr>
-          <td>18-20</td>
-          <td>1,8</td>
-          <td>42-44</td>
-          <td>2,8</td>
-          <td>66-68</td>
-          <td>3,8</td>
-          <td>90-92</td>
-          <td>4,8</td>
-          <td>114-116</td>
-          <td>5,8</td>
-        </tr>
-        <tr>
-          <td>21-22</td>
-          <td>1,9</td>
-          <td>45-46</td>
-          <td>2,9</td>
-          <td>69-70</td>
-          <td>3,9</td>
-          <td>93-94</td>
-          <td>4,9</td>
-          <td>117-118</td>
-          <td>5,9</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td>119-120</td>
-          <td>6,0</td>
-        </tr>
-      </table>
-    </div>
-    <!-- ======================================================================================== -->
-    <h2>Remarques</h2>
-    <div><textarea tabindex="998" id="txtRemarks"></textarea></div>
-    <div style="display: flex; flex-direction: column; margin: 25px">
-      <div class="bold" style="display: flex; justify-content: space-around">
-        <div style="font-style: italic">Signatures</div>
-        <div>
-          Chef·fe de projet<br />
-          <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
-        </div>
-        <div>
-          Expert·e 1<br />
-          <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
-        </div>
-        <div>
-          Expert·e 2<br />
-          <span style="font-size: small; font-style: italic; font-weight: normal">(lieu et date)</span>
-        </div>
-      </div>
-      <div style="display: flex; justify-content: space-around">
-        <div style="height: 80px; width: 20%"></div>
-        <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
-        <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
-        <div style="border-bottom: 2px solid black; height: 80px; width: 20%"></div>
-      </div>
-    </div>
-    <!-- ======================================================================================== -->
-    <div class="row">
-      <div id="cmdFreeze" class="button noprint">Finaliser</div>
-      <div id="cmdSave" class="button noprint">Enregistrer</div>
-    </div>
-
     <!-- The Modal popup, adapted from w3schools -->
     <div id="popup" class="modal">
       <!-- Modal content -->
@@ -514,6 +538,13 @@
   </body>
 
   <script>
+    // Build list of evals present in the directory
+    evals.forEach(function (eval, i) {
+      let opt = document.createElement("option");
+      opt.innerText = eval.cartouche.candidate.name;
+      opt.value = i;
+      dpdEvalSelector.appendChild(opt);
+    });
     var criteria = [
       {
         id: "A1",
@@ -716,7 +747,7 @@
         help: "Le candidat est-il apte à répondre à la question/l'ensemble des experts<br>concernant son travail de manière correcte et suffisamment professionnelle?<br>L'étendue et le degré de finition du produit correspondent au temps investi.<br><h3>Niveau de qualité 3</h3>Les réponses aux questions traitent de tous les aspects de façon professionnelle et différenciée. Les déclarations faites sont, lorsque nécessaire, étayées par des exemples ou assorties de conclusions logiques. Les réponses sont correctes et reflètent les compétences techniques. Le ou la candidat-e peut aussi fournir des renseignements précis sur des détails. Il ou elle répond avec exactitude aux questions des experts, pose des questions si nécessaire et adopte un comportement correct<br><h3>Niveau de qualité 2</h3>Les réponses aux questions négligent un ou plusieurs aspects peu importants ou un aspect d'importance cruciale n'est pas suffisamment éclairci. La plupart des déclarations sont illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit principalement des réponses correctes et peut généralement répondre à des questions détaillées par des renseignements précis.<br><h3>Niveau de qualité 1</h3>Les réponses aux questions négligent un aspect de grande importance ou des aspects d'importance cruciale ne sont pas suffisamment éclaircis. Un grand nombre de déclarations ne sont pas illustrées par des exemples ou des conclusions logiques lorsque cela est nécessaire. Le candidat fournit souvent des réponses erronées ou imprécises.<br><h3>Niveau de qualité 0</h3>Le candidat ne peut pas répondre correctement à la question/à l'ensemble de questions concernant son travail d'examen."
       }
     ];
-    let tabindex = 20;
+    let tabindex = 20; // Leave some room for header fields
 
     // Build the tables
     for (item of criteria) {
@@ -842,10 +873,20 @@
       contextualize();
     });
 
+    dpdEvalSelector.addEventListener("change", function () {
+      divSelector.className = "d-none";
+      divPage.classList.remove("d-none");
+      load(evals[dpdEvalSelector.value]);
+    });
+
+    cmdEmpty.addEventListener("click", function () {
+      divSelector.className = "d-none";
+      divPage.classList.remove("d-none");
+    });
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
       cmdFreeze.style.display = "none"; // so the save function knows it's frozen
-      saveData();
+      saveData(true);
       freezeSheet();
     });
 
@@ -870,8 +911,8 @@
       }
     }
 
-    // If saved data has been read, dispatch it into the fields
-    if (typeof data !== "undefined") {
+    // dispatch the data into the field
+    function load(data) {
       // cartouche
       txtBoss.value = data.cartouche.boss.name;
       txtBossPhone.value = data.cartouche.boss.phone;
@@ -916,12 +957,12 @@
     // The script 'eval.js' is referenced in the header
     // To resume work on a saved sheet, you must move the downloaded file to the html page's directory and name it 'eval.js'
     cmdSave.addEventListener("click", function () {
-      saveData();
+      saveData(false);
     });
 
-    function saveData() {
+    function saveData(final) {
       data = {
-        frozen: cmdFreeze.style.display == "none",
+        frozen: final,
         cartouche: {
           boss: { name: txtBoss.value, phone: txtBossPhone.value, mail: txtBossMail.value },
           candidate: { name: txtCandidate.value, phone: txtCandidatePhone.value, mail: txtCandidateMail.value },
@@ -955,11 +996,23 @@
       // add remarks
       data.remarks = txtRemarks.value;
 
+      // determine the file name
+      let filename = "Eval - unknown.js";
+      if (final) {
+        filename = "Eval TPI " + txtCandidate.value + ".js";
+      } else {
+        if (dpdEvalSelector.value >= 0) {
+          filename = "eval" + (parseInt(dpdEvalSelector.value) + 1) + ".js";
+        } else {
+          filename = "eval" + (evals.length + 1) + ".js";
+        }
+      }
+
       // and now save as downloaded json file
-      var dataStr = "data:text/json;charset=utf-8, var data = " + encodeURIComponent(JSON.stringify(data));
+      var dataStr = "data:text/json;charset=utf-8, evals.push(" + encodeURIComponent(JSON.stringify(data)) + ")";
       var downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", "Eval TPI " + txtCandidate.value + ".js");
+      downloadAnchorNode.setAttribute("download", filename);
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
