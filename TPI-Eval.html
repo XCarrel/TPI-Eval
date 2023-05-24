@@ -170,7 +170,7 @@
   <body>
     Reprendre une évaluation existante
     <select id="dpdEvalSelector">
-      <option value="0">--- Choisir ---</option>
+      <option value="-1">--- Choisir ---</option>
     </select>
     ou
     <button>Page blanche</button>
@@ -532,6 +532,13 @@
   </body>
 
   <script>
+    // Build list of evals present in the directory
+    evals.forEach(function (eval, i) {
+      let opt = document.createElement("option");
+      opt.innerText = eval.cartouche.candidate.name;
+      opt.value = i;
+      dpdEvalSelector.appendChild(opt);
+    });
     var criteria = [
       {
         id: "A1",
