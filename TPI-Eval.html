@@ -997,11 +997,13 @@
       // build the criteria part
       data.criteria = [];
       for (crit of criteria) {
-        data.criteria.push({
-          id: crit.id,
-          points: document.getElementById("pts" + crit.id).value,
-          justification: document.getElementById("jus" + crit.id).value
-        });
+        if (crit.id.charAt(0) != "X") {
+          data.criteria.push({
+            id: crit.id,
+            points: document.getElementById("pts" + crit.id).value,
+            justification: document.getElementById("jus" + crit.id).value
+          });
+        }
       }
 
       // specific criteria
