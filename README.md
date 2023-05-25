@@ -10,11 +10,11 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 ### Et donc ?
 
 - Tu ouvres cette page html dans ton navigateur préféré
-  - S'il y a un fichier 'eval.js' dans le dossier, il est automatiquement rechargé
-  - Sinon tu as une grille vierge 
+  - Tape F1 pour avoir de l'aide
+  - S'il y a un ou plusieurs fichiers 'eval*.js' dans le dossier, tu peux en recharger un grâce à la dropdown list
+  - Sinon tu peux partir sur une grille vierge
 - Tu remplis les champs grisés (les champs de justification sont extensibles)
-- Quand tu as un doute, tu cliques sur le numéro du critère, et ... zbang!
-- Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Cela a pour effet de télécharger un fichier 'Eval TPI \<candidat>.js'
-- Pour reprendre une grille en cours, tu dois déplacer ce fichier dans le répertoire où se trouve le html et le renommer 'eval.js'
-- Quand c'est fini, tu cliques 'finaliser', ça sauve la feuille une dernière fois et la met en lecture seule
-- Tu l'imprimes
+- Quand tu as un doute, tu cliques sur le numéro du critère ou tu presse F1, et ... zbang!
+- Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Cela a pour effet de télécharger un fichier 'eval\<x>.js'. **Déplace ce fichier dans le dossier de TPI-Eval (remplace l'existant)**
+- Quand c'est fini, tu cliques 'finaliser', ça télécharge un ficher 'Eval TPI - \<candidat>.js et la met en lecture seule.
+- Tu l'imprimes depuis le navigateur
