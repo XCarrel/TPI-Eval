@@ -755,7 +755,7 @@
     let tabindex = 20; // Leave some room for header fields
     var helpcontext; // The id of the criteria on which help must be provided when F1 is hit
     document.addEventListener("keydown", function (e) {
-      if (e.key == "F1") showModal(helpcontext);
+      if (e.key == "F1" && e.shiftKey) showModal(helpcontext);
       if (e.key == "Escape") modal.style.display = "none";
     });
 
