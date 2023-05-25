@@ -10,7 +10,7 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 ### Et donc ?
 
 - Tu ouvres cette page html dans ton navigateur préféré
-  - Tape F1 pour avoir de l'aide
+  - Tape shift-F1 pour avoir de l'aide
   - S'il y a un ou plusieurs fichiers 'eval*.js' dans le dossier, tu peux en recharger un grâce à la dropdown list
   - Sinon tu peux partir sur une grille vierge
 - Tu remplis les champs grisés (les champs de justification sont extensibles)
