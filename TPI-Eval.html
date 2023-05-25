@@ -748,11 +748,17 @@
       }
     ];
     let tabindex = 20; // Leave some room for header fields
+    var helpcontext; // The id of the criteria on which help must be provided when F1 is hit
+    document.addEventListener("keydown", function (e) {
+      if (e.key == "F1") showModal(helpcontext);
+      if (e.key == "Escape") modal.style.display = "none";
+    });
 
     // Build the tables
     for (item of criteria) {
       let r = document.createElement("div");
       r.className = "row";
+      r.id = "row" + item.id;
 
       // id cell
       let cid = document.createElement("div");
@@ -772,8 +778,11 @@
       if (item.id.charAt(0) == "A" && parseInt(item.id.substring(1)) >= 14 && parseInt(item.id.substring(1)) <= 20) {
         let desccrit = document.createElement("input");
         desccrit.type = "text";
-        desccrit.id = "critspec" + item.id;
+        desccrit.id = "csp" + item.id;
         desccrit.tabIndex = tabindex++;
+        desccrit.addEventListener("focus", function (e) {
+          helpcontext = e.target.id.substring(3);
+        });
         cname.appendChild(desccrit);
       }
 
@@ -781,8 +790,11 @@
       if (item.id.charAt(0) == "C" && parseInt(item.id.substring(1)) >= 5 && parseInt(item.id.substring(1)) <= 10) {
         let question = document.createElement("input");
         question.type = "text";
-        question.id = "question" + item.id;
+        question.id = "qst" + item.id;
         question.tabIndex = tabindex++;
+        question.addEventListener("focus", function (e) {
+          helpcontext = e.target.id.substring(3);
+        });
         cname.appendChild(question);
       }
 
@@ -795,15 +807,21 @@
       numcpts.max = 3;
       numcpts.id = "pts" + item.id;
       numcpts.tabIndex = tabindex++;
+      numcpts.addEventListener("focus", function (e) {
+        helpcontext = e.target.id.substring(3);
+      });
       cpts.appendChild(numcpts);
 
       // justification cell
       let cjust = document.createElement("div");
       cjust.className = "cell col-7 center";
       let txtjust = document.createElement("textarea");
-      txtjust.id = "just" + item.id;
+      txtjust.id = "jus" + item.id;
       txtjust.type = "text";
       txtjust.tabIndex = tabindex++;
+      txtjust.addEventListener("focus", function (e) {
+        helpcontext = e.target.id.substring(3);
+      });
       cjust.appendChild(txtjust);
 
       // finalize row
@@ -930,18 +948,18 @@
       // criteria
       for (crit of data.criteria) {
         document.getElementById("pts" + crit.id).value = crit.points;
-        document.getElementById("just" + crit.id).value = crit.justification;
+        document.getElementById("jus" + crit.id).value = crit.justification;
       }
       computeGrade();
 
       // specifics
       for (i = 14; i <= 20; i++) {
-        document.getElementById("critspecA" + i).value = data.specifics[i - 14];
+        document.getElementById("cspA" + i).value = data.specifics[i - 14];
       }
 
       // questions
       for (i = 5; i <= 10; i++) {
-        document.getElementById("questionC" + i).value = data.questions[i - 5];
+        document.getElementById("qstC" + i).value = data.questions[i - 5];
       }
 
       // remarks
@@ -977,20 +995,20 @@
         data.criteria.push({
           id: crit.id,
           points: document.getElementById("pts" + crit.id).value,
-          justification: document.getElementById("just" + crit.id).value
+          justification: document.getElementById("jus" + crit.id).value
         });
       }
 
       // specific criteria
       data.specifics = [];
       for (i = 14; i <= 20; i++) {
-        data.specifics.push(document.getElementById("critspecA" + i).value);
+        data.specifics.push(document.getElementById("cspA" + i).value);
       }
 
       // questions
       data.questions = [];
       for (i = 5; i <= 10; i++) {
-        data.questions.push(document.getElementById("questionC" + i).value);
+        data.questions.push(document.getElementById("qstC" + i).value);
       }
 
       // add remarks
