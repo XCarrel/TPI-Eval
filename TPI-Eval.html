@@ -7,6 +7,7 @@
 
   <title>TPI-Eval</title>
   <script>
+    let indexEval = 0;
     let evalsIsEmpty = null;
     let evalCheckboxChecked = null;
     const nbEvals = 10;
@@ -49,6 +50,7 @@
     function addEvaluationButtons() {
       const listOfEvals = document.getElementById("listOfEvals");
 
+      // checkBox is checked then print all evals
       if (evalCheckboxChecked) {
 
         evals.forEach((eval, index) => {
@@ -58,15 +60,25 @@
       }
       else {
 
-        // trouver un système pour incrémenter ...
-        const b = createEvalButton(eval, index);
-        listOfEvals.appendChild(b);
+        if (indexEval < evals.length) {
 
-        showModal("Charger le suivant ", evals[index + 1]);
-      };
+          const b = createEvalButton(evals[indexEval], indexEval);
+          listOfEvals.appendChild(b);
+        } 
+        indexEval++;
+
+        if (indexEval < evals.length) {
+
+          const candidateName = evals[indexEval].cartouche.candidate.name;
+          showModal(`Charger le suivant : ` + candidateName);
+        } else {
+
+          indexEval = 0;
+          closeModal();
+        }
+
+      }
     }
-
-
 
     function displayEvalControls() {
       const msgEvalSelector = document.getElementById("msgEvalSelector");
@@ -91,6 +103,7 @@
       // car le système doit créer le tableau 
       setTimeout(displayEvalControls, 500);
     });
+
   </script>
 
   <style>
@@ -498,7 +511,7 @@
 
     .modal-content {
       position: relative;
-      min-height: 140px;
+      min-height: 160px;
       min-width: 400px;
       background-color: var(--modalBackgroundColor);
       margin: auto;
@@ -1682,6 +1695,8 @@
   }
 
   function showModal(content) {
+    console.log(content);
+
     const crit = criteria.find((c) => c.id === content);
 
     if (typeof crit === "undefined") {
@@ -1704,7 +1719,11 @@
 
   function onConfirm() {
     addEvaluationButtons();
-    closeModal();
+    if (evalCheckboxChecked) {
+      closeModal();
+    }
+
+
   }
 
   // Gestionnaire d'événements pour fermer la fenêtre modale en cliquant à l'extérieur
