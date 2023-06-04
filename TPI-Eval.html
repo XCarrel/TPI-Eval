@@ -48,11 +48,10 @@
 			button.appendChild(buttonContent);
 
 			button.addEventListener("click", () => {
-				tpiEvalCurrent = evalsList[index];
+				tpiEvalCurrent = eval;
 				load(tpiEvalCurrent);
 				showFrom();
 			});
-
 			return button;
 		}
 
@@ -85,7 +84,6 @@
 				} else {
 					currentEvalIndex = 0;
 					closeModal();
-					loadButtonsEvaluation();
 				}
 			}
 		}
@@ -96,10 +94,16 @@
 			getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
 				debugLog(`evalDB chargée depuis getFromIndexedDB ${JSON.stringify(evalDB)}`);
 
-				evalDB.forEach((eval, index) => {
-					const button = createEvalButton(eval, index);
-					listOfevalsList.appendChild(button);
-				});
+				if (evalDB) {
+					evalDB.forEach((eval, index) => {
+						const button = createEvalButton(eval, index);
+						listOfevalsList.appendChild(button);
+					});
+				}
+				else {
+					msgevalsListelector.style.display = "none";
+					showModal("Aucune évaluation trouvée.<br>Veuillez créer une nouvelle évaluation.");
+				}
 			});
 		}
 
@@ -114,8 +118,7 @@
 
 				showModal(content);
 			} else {
-				msgevalsListelector.style.display = "none";
-				showModal("Aucune évaluation trouvée.<br>Veuillez créer une nouvelle évaluation.");
+				loadButtonsEvaluation();
 			}
 		}
 
@@ -124,9 +127,6 @@
 			loadScripts(totalEvals);
 			// Call the function to display evaluation controls directly
 			setTimeout(() => { displayEvalControls(); }, 100);
-
-
-
 		});
 	</script>
 
@@ -1025,8 +1025,6 @@
 	</footer>
 </body>
 
-
-
 <script>
 
 	document.getElementById("printEvalsListDB").addEventListener("click", function () {
@@ -1689,14 +1687,13 @@
 	}
 
 	function saveToIndexedDB(dbName, storeName, data) {
-
-		debugLog(`nom db: ${dbName}, storeName: ${storeName}, data: ${JSON.stringify(data)}`);
-
 		let request = indexedDB.open(dbName);
 
-		request.onupgradeneeded = function (event) {
+		debugLog("SaveToIndexedDB");
 
+		request.onupgradeneeded = function (event) {
 			let db = event.target.result;
+
 			if (!db.objectStoreNames.contains(storeName)) {
 				// Si l'object store n'existe pas, le créer lors de la mise à niveau de la base de données
 				db.createObjectStore(storeName, { keyPath: "id", autoIncrement: true });
@@ -1722,12 +1719,14 @@
 
 				if (!existingData || existingData.length === 0) {
 					// S'il n'y a aucune donnée existante, ajouter les nouvelles données directement
+					debugLog("données ajoutée dans avec ADD");
 					store.add(data);
 				} else {
 					let isDuplicate = false;
 
 					for (let existingItem of existingData) {
 						if (existingItem.id === data.id) {
+							debugLog("données doublées, mise à jour ");
 							// S'il existe déjà une donnée avec le même ID, mettre à jour les données
 							isDuplicate = true;
 							store.put(data);
@@ -1764,7 +1763,7 @@
 		request.onupgradeneeded = function (event) {
 			console.log("La base de données n'existe pas.");
 			request.deleteDatabase(dbName);
-			callback([]);
+			callback(false);
 		};
 
 		request.onsuccess = function (event) {
@@ -1772,7 +1771,7 @@
 
 			if (!db.objectStoreNames.contains(storeName)) {
 				console.log(`L'object store '${storeName}' n'existe pas.`);
-				callback([]);
+				callback(false);
 				return;
 			}
 
@@ -1788,13 +1787,13 @@
 
 			getRequest.onerror = function (event) {
 				console.log("Erreur lors de la récupération des données :", event.target.error);
-				callback([]);
+				callback(false);
 			};
 		};
 
 		request.onerror = function (event) {
 			console.log("Erreur lors de l'ouverture de la base de données :", event.target.error);
-			callback([]);
+			callback(false);
 		};
 	}
 
@@ -1925,6 +1924,7 @@
 		let data = isNewEval ? buildData(final) : { ...tpiEvalCurrent, frozen: final };
 
 		debugLog(`flag isNewEval : ${isNewEval}`);
+		debugLog(`Data dans saveData ${JSON.stringify(data)}`);
 
 		// Préfixe par défaut pour les clés des évaluations
 		const DEFAULT_KEY_PREFIX = "eval";
@@ -1942,8 +1942,6 @@
 		if (saveToLocal) {
 			// Sauvegarder les données dans le localStorage
 			//saveToLocalStorage(keyOrFilename, data);
-
-			debugLog(`données sauvées :${JSON.stringify(data)}`);
 
 			// https://developer.mozilla.org/fr/docs/Web/API/IndexedDB_API
 			saveToIndexedDB(db_Evals, t_Name, data);
