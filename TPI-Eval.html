@@ -7,7 +7,7 @@
 
 	<title>TPI-Eval</title>
 	<script>
-		const DEBUG = true;
+		const DEBUG = false;
 		const db_Evals = "DBevals"; // Nom de la base de données (NoSQL, IndexedDB)
 		const t_Name = "tpi"; // Nom de l'entité
 
@@ -1083,6 +1083,7 @@
 </body>
 
 <script>
+
 	document.getElementById("printEvalsListDB").addEventListener("click", function () {
 		getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
 			debugLog(`evalDB chargée depuis getFromIndexedDB`);
@@ -1390,14 +1391,19 @@
 			case "C":
 				tblPres.appendChild(r);
 				break;
+			default:
+				break;
 		}
 	}
 
-	// setup event handlers that will keep the grade accurate
-	for (inputpoints of document.getElementsByClassName("points")) {
-		inputpoints.addEventListener("change", function (e) {
-			if (e.target.value > 3) e.target.value = 3;
-			if (e.target.value < 0) e.target.value = 0;
+	// Définit les gestionnaires d'événements pour maintenir la précision de la note
+	var inputsPoints = document.getElementsByClassName("points");
+
+	for (var i = 0; i < inputsPoints.length; i++) {
+		inputsPoints[i].addEventListener("change", function (e) {
+			var value = parseInt(e.target.value);
+			value = Math.max(0, Math.min(3, value)); // Limite la valeur entre 0 et 3
+			e.target.value = value;
 			computeGrade();
 		});
 	}
@@ -1408,26 +1414,33 @@
 		let totalB = 0;
 		let totalC = 0;
 
-		for (inputpoints of document.getElementsByClassName("points")) {
-			if (inputpoints.value > 0)
-				switch (inputpoints.parentNode.parentNode.parentNode.dataset.part) {
-					case "A":
-						totalA += parseInt(inputpoints.value);
-						break;
-					case "B":
-						totalB += parseInt(inputpoints.value);
-						break;
-					case "C":
-						totalC += parseInt(inputpoints.value);
-						break;
-				}
+		// Calculer les totaux pour chaque partie en parcourant les éléments de classe "points"
+		for (let inputPoints of document.getElementsByClassName("points")) {
+			const value = parseInt(inputPoints.value);
+			const part = inputPoints.parentNode.parentNode.parentNode.dataset.part;
+
+			switch (part) {
+				case "A":
+					totalA += value;
+					break;
+				case "B":
+					totalB += value;
+					break;
+				case "C":
+					totalC += value;
+					break;
+			}
 		}
+
+		// Mettre à jour les éléments HTML avec les totaux et la note globale
 		divTotalA.innerText = totalA;
 		divTotalB.innerText = totalB;
 		divTotalC.innerText = totalC;
-		let total = totalA + totalB + totalC;
+
+		const total = totalA + totalB + totalC;
 		divTotal.innerText = total;
-		let grade = (total / 120.0) * 5 + 1;
+
+		const grade = (total / 120) * 5 + 1;
 		divGrade.innerText = grade.toFixed(1);
 	}
 
@@ -1544,11 +1557,11 @@
 		}
 	}
 
-	// dispatch the data into the field
+	// Dispatche les données dans les champs
 	function load(data) {
+		isNewEval = false; // Permet d'éviter de générer une nouvelle ID
 
-		isNewEval = false; /* Permet d'éviter de générer une nouvelle ID */
-
+		// Chargement des données de la cartouche
 		txtBoss.value = data.cartouche.boss.name;
 		txtBossPhone.value = data.cartouche.boss.phone;
 		txtBossMail.value = data.cartouche.boss.mail;
@@ -1565,6 +1578,7 @@
 		txtExpert2Phone.value = data.cartouche.expert2.phone;
 		txtExpert2Mail.value = data.cartouche.expert2.mail;
 
+		// Chargement des critères
 		for (crit of data.criteria) {
 			document.getElementById("pts" + crit.id).value = crit.points;
 			document.getElementById("just" + crit.id).value = crit.justification;
@@ -1572,18 +1586,22 @@
 
 		computeGrade();
 
+		// Chargement des spécificités
 		for (i = 14; i <= 20; i++) {
 			document.getElementById("critspecA" + i).value = data.specifics[i - 14];
 		}
 
+		// Chargement des questions
 		for (i = 5; i <= 10; i++) {
 			document.getElementById("questionC" + i).value = data.questions[i - 5];
 		}
 
 		txtRemarks.value = data.remarks;
 		contextualize();
+
 		if (data.frozen) freezeSheet();
 	}
+
 
 	cmdGetFile.addEventListener("click", function () { saveData(false, false); });
 
