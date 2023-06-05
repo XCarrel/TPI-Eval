@@ -18,9 +18,10 @@
 		let counter = 0; // Compteur pour générer un nombre unique
 		let currentEvalIndex = 0; // Indice de l'évaluation actuelle
 
-		let isNewEval = false; // Indicateur si les évaluations sont vides
+		let isNewEval = false; // Indicateur utilisé pour identifier les évaluations qui n'ont pas d'ID attribué 
 		let isEvalCheckboxChecked = null; // Indicateur si la case à cocher de l'évaluation est cochée
 		let isEvalCheckboxDisabled = null; // Indicateur si la case à cocher de l'évaluation est désactivée
+		let shouldDisplayPopup = null; // Variable contrôlant l'affichage de la popup
 
 		function loadScripts(totalEvals) {
 			for (let i = 1; i <= totalEvals; i++) {
@@ -55,24 +56,19 @@
 			return button;
 		}
 
-		// cette fonction est appelée par le bouton confirme de la fenetre popup 
-		// addEvaluationTOdb()
-		function addEvaluationButtons() {
+		// Cette fonction est appelée par le bouton de confirmation de la fenêtre popup.
+		// ajouterEvaluationsALaBaseDeDonnees()
+		function addEvaluationsToDatabase() {
 
-			// checkBox is checked then print all evalsList
+			// Si la checkbox est cochée, alors imprimer toutes les évaluations de la liste
 			if (isEvalCheckboxChecked) {
 				evalsList.forEach((eval, index) => {
-					// const buton = createEvalButton(eval, index);
-					// listOfevalsList.appendChild(buton);
 					saveToIndexedDB(db_Evals, t_Name, eval);
 				});
-
 			} else {
 				isEvalCheckboxDisabled = true;
 
 				if (currentEvalIndex < evalsList.length) {
-					// const buton = createEvalButton( evalsList[currentEvalIndex],currentEvalIndex);
-					// listOfevalsList.appendChild(buton);
 					saveToIndexedDB(db_Evals, t_Name, evalsList[currentEvalIndex]);
 				}
 
@@ -92,9 +88,11 @@
 			const listOfevalsList = document.getElementById("listOfevalsList");
 
 			getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
+
 				debugLog(`evalDB chargée depuis getFromIndexedDB ${JSON.stringify(evalDB)}`);
 
 				if (evalDB) {
+
 					evalDB.forEach((eval, index) => {
 						const button = createEvalButton(eval, index);
 						listOfevalsList.appendChild(button);
@@ -117,39 +115,48 @@
 					evalsList.map((eval) => eval.cartouche.candidate.name).join(", ");
 
 				showModal(content);
-			} else {
-				loadButtonsEvaluation();
 			}
 		}
 
 		document.addEventListener("DOMContentLoaded", () => {
-			// Call the function to load scripts asynchronously
+			loadButtonsEvaluation();
 			loadScripts(totalEvals);
-			// Call the function to display evaluation controls directly
-			setTimeout(() => { displayEvalControls(); }, 100);
+
+			const shouldDisplayPopup = sessionStorage.getItem('shouldDisplayPopup');
+
+			if (shouldDisplayPopup === null) {
+				sessionStorage.setItem('shouldDisplayPopup', 'true');
+			} else if (shouldDisplayPopup === 'true') {
+				setTimeout(displayEvalControls, 100);
+				sessionStorage.setItem('shouldDisplayPopup', 'false');
+			}
 		});
 	</script>
 
 	<style>
 		:root {
-			/* Couleurs primaires */
-			--primaryColor: #0c67b2;
-			--secondaryColor: #ffc107;
-			--successColor: #4caf50;
-			--warningColor: #ff9800;
-			--dangerColor: #f44336;
-
-			/* Couleurs de fond */
-			--backgroundColor: #f5f5f5;
-			--modalBackgroundColor: #fefefe;
-			--headerBackgroundColor: #aaaaaa;
-
-			/* Couleurs du texte */
-			--textColor: #333;
-			--modalTextColor: #888;
-
-			/*hover */
-			--titleHover: #ff6347;
+			--primaryColor: #407BB8;
+			/* Ancienne: #2c3e50 */
+			--secondaryColor: #D3D8DC;
+			/* Ancienne: #bdc3c7 */
+			--successColor: #58C486;
+			/* Ancienne: #27ae60 */
+			--warningColor: #FAB861;
+			/* Ancienne: #f39c12 */
+			--dangerColor: #FF706F;
+			/* Ancienne: #e74c3c */
+			--backgroundColor: #F5F7F8;
+			/* Ancienne: #ecf0f1 */
+			--modalBackgroundColor: #F5F7F8;
+			/* Ancienne: #ecf0f1 */
+			--headerBackgroundColor: #84A1B5;
+			/* Ancienne: #5D7A94 */
+			--textColor: #4D7280;
+			/* Ancienne: #2c3e50 */
+			--modalTextColor: #4D7280;
+			/* Ancienne: #2c3e50 */
+			--titleHover: #5CB1E6;
+			/* Ancienne: #3498db */
 		}
 
 		body {
@@ -352,6 +359,7 @@
 
 		th {
 			background-color: var(--headerBackgroundColor);
+			color: white;
 		}
 
 		tr:nth-child(even) {
@@ -408,8 +416,8 @@
 		}
 
 		#cmdEmpty {
-			background-color: #88b5e3;
-			color: black;
+			background-color: var(--primaryColor);
+			color: white;
 			border: none;
 			padding: 10px;
 			margin: 10px;
@@ -418,10 +426,15 @@
 			transition: background-color 0.3s ease;
 		}
 
+		#listOfevalsList {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+		}
+
 		#listOfevalsList button {
-			display: inline-block;
-			width: auto;
-			height: auto;
+			width: 200px;
+			height: 220px;
 			min-height: 120px;
 			padding: 12px;
 			margin: 7px;
@@ -461,9 +474,7 @@
 			position: absolute;
 			width: 100%;
 			height: 100%;
-			background: linear-gradient(to bottom,
-					rgba(0, 0, 0, 0.4) 0%,
-					rgba(0, 0, 0, 0) 100%);
+			background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
 			opacity: 0;
 			transition: opacity 0.3s ease;
 		}
@@ -485,6 +496,7 @@
 			background-color: var(--titleHover);
 		}
 
+
 		.button {
 			display: inline-block;
 			padding: 10px 20px;
@@ -504,6 +516,17 @@
 		}
 
 		@media print {
+
+			/* Ajoute une marge sur les pages imprimées pour faciliter la lecture */
+			@page {
+				margin: 1cm;
+			}
+
+			body {
+				/* Assure une taille de police adéquate pour l'impression */
+				font-size: 12pt;
+			}
+
 			.pagebreak {
 				page-break-before: always;
 			}
@@ -515,6 +538,43 @@
 			div {
 				-webkit-print-color-adjust: exact !important;
 				print-color-adjust: exact !important;
+			}
+
+			/* Imprime les liens avec leur URL */
+			a:after {
+				content: " (" attr(href) ") ";
+				font-size: 0.8em;
+				font-weight: normal;
+			}
+
+			/* Retire les éléments visuels qui ne sont pas nécessaires à l'impression */
+			.modal,
+			#testLoad,
+			#cmdErase {
+				display: none;
+			}
+
+			/* Assure une bonne visibilité des textes */
+			:root {
+				--textColor: black;
+				--primaryColor: black;
+				--secondaryColor: black;
+				--successColor: black;
+				--warningColor: black;
+				--dangerColor: black;
+			}
+
+			textarea {
+				border: 1px solid lightgray;
+				background-color: #f5f5f5;
+				padding: 8px;
+				font-family: "Calibri", Arial, sans-serif;
+				font-size: 14px;
+				line-height: 1.6;
+				border-radius: 4px;
+				box-sizing: border-box;
+				resize: none;
+				/* Pour désactiver le redimensionnement lors de l'impression */
 			}
 		}
 
@@ -559,6 +619,7 @@
 			text-decoration: none;
 		}
 	</style>
+
 </head>
 
 <header>
@@ -618,14 +679,10 @@
 					Procédure de qualification : 88600/1/2/3 Informaticienne
 					CFC/Informaticien CFC (Ordonnance 2014)
 				</p>
-				<p>
-					Formulaire d’évaluation Candidat/-e:<span class="value" id="spnCandidate"></span>
-				</p>
+				<p>Formulaire d’évaluation Candidat/-e:<span class="value" id="spnCandidate"></span></p>
 				<hr />
 			</div>
-
 			<!-- ======================================================================================== -->
-
 			<div id="divCartouche">
 				<div class="table">
 					<div class="row">
@@ -1026,11 +1083,10 @@
 </body>
 
 <script>
-
 	document.getElementById("printEvalsListDB").addEventListener("click", function () {
 		getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
-			debugLog(`evalDB chargée depuis getFromIndexedDB ${JSON.stringify(evalDB)}`);
-			// Faites quelque chose avec les données récupérées ici
+			debugLog(`evalDB chargée depuis getFromIndexedDB`);
+
 		});
 	});
 
@@ -1385,17 +1441,16 @@
 		contextualize();
 	});
 
-	// Fonction pour vérifier les données dans le localStorage et les ajouter
 	function checkLocalStorageData() {
 		let i = 1;
 		let key = `eval${i}`;
 		let myData = localStorage.getItem(key);
 
 		while (myData !== null) {
-			console.log(
-				`La clé ${key} existe dans le localStorage. Sa valeur est : ${myData}`
-			);
-			console.log(`Ajout d'une option sélect`);
+
+			debugLog(`La clé ${key} existe dans le localStorage. Sa valeur est : ${myData}`)
+			debugLog(`Ajout d'une option sélect`);
+
 			const data = JSON.parse(myData);
 
 			let optionExists = false;
@@ -1429,7 +1484,7 @@
 			divSelector.classList.remove("d-none");
 			divPage.classList.add("d-none");
 		} else {
-			console.log("Pas de données locales ", value);
+			debugLog("Pas de données locales ", value);
 
 			setTimeout(function () {
 				divSelector.classList.add("d-none");
@@ -1449,72 +1504,23 @@
 		divPage.classList.remove("d-none");
 	}
 
-	// // Get the button by its ID
-	// const eraseButton = document.getElementById("cmdErase");
-
-	// // Add a click event listener to the button
-	// eraseButton.addEventListener("click", function () {
-	// 	// Clear the local storage
-	// 	localStorage.clear();
-	// 	// Log a message to the console
-	// 	console.log("Local storage has been cleared.");
-
-	// 	document.getElementsByClassName("menu");
-	// });
-
 	// Add the event listener
-	document.getElementById("cmdFreeze").addEventListener("click", handleClick);
+	document.getElementById("cmdFreeze").addEventListener("click", function handleClick() {
+		// Hide the button to indicate it's frozen
+		hideButton();
 
-	//https://github.com/spipu/html2pdf/blob/master/doc/basic.md
-	//https://github.com/eKoopmans/html2pdf.js#usage
-	// Function to handle the click event
-	function handleClick() {
-		try {
-			// Hide the button to indicate it's frozen
-			hideButton();
+		// Save data and get the filename
+		saveData(true, false);
 
-			// Save data and get the filename
-			const filename = saveData(true, false);
+		// Freeze the sheet
+		freezeSheet();
+	});
 
-			// Freeze the sheet
-			freezeSheet();
-
-			// Get the element to convert to PDF
-			var element = document.getElementById("divSheet");
-
-			const tmpStyle = element.style.fontSize;
-
-			element.style.fontSize = "12px";
-
-			// Convert the HTML to PDF and save it
-			convertHtmlToPdf(element, filename);
-			element.style.fontSize = tmpStyle;
-
-			// Log the success message
-			console.log(`PDF generated and saved as ${filename}`);
-		} catch (error) {
-			console.error(`An error occurred: ${error}`);
-		}
-	}
 
 	// Function to hide the button
 	function hideButton() {
 		const cmdFreeze = document.getElementById("cmdFreeze");
 		cmdFreeze.style.display = "none";
-	}
-
-	// Function to convert HTML to PDF
-	function convertHtmlToPdf(element, filename) {
-		var opt = {
-			margin: [1.5, 1.5, 1.5, 1],
-			filename: filename,
-			image: { type: "jpeg", quality: 0.98 },
-			html2canvas: { scale: 2 },
-			jsPDF: { unit: "cm", format: "a4", orientation: "portrait" },
-		};
-
-		// New Promise-based usage:
-		html2pdf().set(opt).from(element).save();
 	}
 
 	function freezeSheet() {
@@ -1540,6 +1546,9 @@
 
 	// dispatch the data into the field
 	function load(data) {
+
+		isNewEval = false; /* Permet d'éviter de générer une nouvelle ID */
+
 		txtBoss.value = data.cartouche.boss.name;
 		txtBossPhone.value = data.cartouche.boss.phone;
 		txtBossMail.value = data.cartouche.boss.mail;
@@ -1626,6 +1635,9 @@
 	}
 
 	function buildData(final) {
+
+		let id;
+
 		const criteriaData = criteria.map((crit) => ({
 			id: crit.id,
 			points: document.getElementById(`pts${crit.id}`).value,
@@ -1644,8 +1656,11 @@
 
 		date = new Date().toLocaleDateString();
 
+		if (isNewEval) { id = generateUniqueId(); }
+		else { id = tpiEvalCurrent.id; }
+
 		return {
-			id: generateUniqueId(),
+			id: id,
 			dateLastSave: date,
 			frozen: final,
 			cartouche: {
@@ -1713,9 +1728,7 @@
 			let transaction = db.transaction(storeName, "readwrite");
 			let store = transaction.objectStore(storeName);
 
-			let getRequest = store.get(data.id);  // si getRequest est true alors doublon 
-
-			//let getRequest = store.getAll();
+			let getRequest = store.getAll();
 
 			getRequest.onsuccess = function (event) {
 				let existingData = event.target.result;
@@ -1925,10 +1938,7 @@
 	function saveData(final, saveToLocal) {
 
 		// Vérifier si c'est une nouvelle évaluation ou une évaluation existante
-		let data = isNewEval ? buildData(final) : { ...tpiEvalCurrent, frozen: final };
-
-		debugLog(`flag isNewEval : ${isNewEval}`);
-		debugLog(`Data dans saveData ${JSON.stringify(data)}`);
+		let data = buildData(final);
 
 		// Préfixe par défaut pour les clés des évaluations
 		const DEFAULT_KEY_PREFIX = "eval";
@@ -1944,8 +1954,6 @@
 				`${DEFAULT_KEY_PREFIX}${evalsList.length + 1}`;
 
 		if (saveToLocal) {
-			// Sauvegarder les données dans le localStorage
-			//saveToLocalStorage(keyOrFilename, data);
 
 			// https://developer.mozilla.org/fr/docs/Web/API/IndexedDB_API
 			saveToIndexedDB(db_Evals, t_Name, data);
@@ -2024,7 +2032,7 @@
 	}
 
 	function onConfirm() {
-		addEvaluationButtons();
+		addEvaluationsToDatabase();
 		if (isEvalCheckboxChecked) {
 			closeModal();
 		}
