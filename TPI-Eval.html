@@ -56,33 +56,55 @@
 			return button;
 		}
 
+		function reloadPageWithDelay() {
+			setTimeout(() => {
+				location.reload();
+			}, 400);
+		}
+
+
 		// Cette fonction est appelée par le bouton de confirmation de la fenêtre popup.
-		// ajouterEvaluationsALaBaseDeDonnees()
 		function addEvaluationsToDatabase() {
+			const isEvalCheckboxChecked = getEtatCheckboxEval();
+			const nombreEvaluations = evalsList.length;
 
-			// Si la checkbox est cochée, alors imprimer toutes les évaluations de la liste
 			if (isEvalCheckboxChecked) {
-				evalsList.forEach((eval, index) => {
-					saveToIndexedDB(db_Evals, t_Name, eval);
-				});
+				enregistrerEvaluationsDansIndexedDB(evalsList);
+				/* L'instruction reload est précédée d'une suspension de 0 secondes pour permettre l'enregistrement des évaluations dans IndexedDB. 
+				Cette pause garantit que toutes les opérations nécessaires sont effectuées avant de rafraîchir la page, évitant ainsi tout problème potentiel. 
+				Ensuite, la page est rechargée pour actualiser les données affichées, assurant ainsi le bon enregistrement des changements dans la base de données IndexedDB. */
+				reloadPageWithDelay();
 			} else {
-				isEvalCheckboxDisabled = true;
+				desactiverCheckboxEval();
 
-				if (currentEvalIndex < evalsList.length) {
+				if (currentEvalIndex < nombreEvaluations) {
 					saveToIndexedDB(db_Evals, t_Name, evalsList[currentEvalIndex]);
 				}
 
 				currentEvalIndex++;
 
-				if (currentEvalIndex < evalsList.length) {
-					const candidateName = evalsList[currentEvalIndex].cartouche.candidate.name;
-					showModal(`Charger le suivant : ` + candidateName);
+				if (currentEvalIndex < nombreEvaluations) {
+					const nomCandidat = evalsList[currentEvalIndex].cartouche.candidate.name;
+					showModal(`Charger le suivant : ${nomCandidat}`);
 				} else {
-					currentEvalIndex = 0;
+					reinitialiserIndexEval();
 					closeModal();
+					reloadPageWithDelay();
 				}
 			}
 		}
+
+		function enregistrerEvaluationsDansIndexedDB(evals) {
+			evals.forEach((eval) => {
+				saveToIndexedDB(db_Evals, t_Name, eval);
+			});
+		}
+
+		function getEtatCheckboxEval() { return isEvalCheckboxChecked; }
+
+		function desactiverCheckboxEval() { isEvalCheckboxDisabled = true; }
+
+		function reinitialiserIndexEval() { currentEvalIndex = 0; }
 
 		function loadButtonsEvaluation() {
 			const listOfevalsList = document.getElementById("listOfevalsList");
@@ -100,7 +122,6 @@
 				}
 				else {
 					msgevalsListelector.style.display = "none";
-					showModal("Aucune évaluation trouvée.<br>Veuillez créer une nouvelle évaluation.");
 				}
 			});
 		}
@@ -110,24 +131,23 @@
 
 			if (evalsList.length > 0) {
 				msgevalsListelector.style.display = "block";
-
 				const content = "Souhaitez-vous importer cette évaluation ?" +
 					evalsList.map((eval) => eval.cartouche.candidate.name).join(", ");
-
 				showModal(content);
 			}
 		}
 
 		document.addEventListener("DOMContentLoaded", () => {
-			loadButtonsEvaluation();
 			loadScripts(totalEvals);
+			loadButtonsEvaluation();
 
 			const shouldDisplayPopup = sessionStorage.getItem('shouldDisplayPopup');
 
 			if (shouldDisplayPopup === null) {
 				sessionStorage.setItem('shouldDisplayPopup', 'true');
+				location.reload(3);
 			} else if (shouldDisplayPopup === 'true') {
-				setTimeout(displayEvalControls, 100);
+				setTimeout(displayEvalControls, 200);
 				sessionStorage.setItem('shouldDisplayPopup', 'false');
 			}
 		});
@@ -1650,6 +1670,7 @@
 		request.onblocked = function () {
 			console.warn("La réinitialisation de la base de données a été bloquée par une autre transaction.");
 		};
+		location.reload();
 	}
 
 	function buildData(final) {
@@ -1842,6 +1863,7 @@
 		});
 
 		let exportData = {};
+		
 		for (let storeName of db.objectStoreNames) {
 			exportData[storeName] = await new Promise((resolve, reject) => {
 				let objectStore = db.transaction(storeName).objectStore(storeName);
@@ -1870,7 +1892,6 @@
 		linkElement.setAttribute("download", exportFileDefaultName);
 		linkElement.click();
 	}
-
 
 	document.getElementById("importEvalsListToDB").addEventListener("click", function () {
 		document.getElementById("fileInput").click();
