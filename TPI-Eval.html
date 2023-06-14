@@ -7,12 +7,14 @@
 
 	<title>TPI-Eval</title>
 	<script>
-		const DEBUG = false;
+		const DEBUG = true; // Mode de débogage
+
 		const db_Evals = "DBevals"; // Nom de la base de données (NoSQL, IndexedDB)
 		const t_Name = "tpi"; // Nom de l'entité
 
 		const totalEvals = 10; // Nombre total d'évaluations
-		let evalsList = []; // Liste des évaluations
+		let loadedEvaluations = []; // Liste des évaluations chargées via la balise <script> dans le <head> du DOM
+		let databaseEvaluations = []; // Liste des évaluations provenant de la base de données
 
 		let tpiEvalCurrent = null; // tpiEval de l'évaluation actuellement chargée
 		let counter = 0; // Compteur pour générer un nombre unique
@@ -23,12 +25,19 @@
 		let isEvalCheckboxDisabled = null; // Indicateur si la case à cocher de l'évaluation est désactivée
 		let shouldDisplayPopup = null; // Variable contrôlant l'affichage de la popup
 
+		let isEvalJSDuplicated = false; // Indicateur indiquant si l'évaluation de JavaScript est dupliquée ou non
+		let isEvalJSMoreRecent = false; // Indicateur indiquant si l'évaluation de JavaScript est plus récente ou non
+
+		/**
+		 * * Charge les scripts JavaScript correspondant aux évaluations.
+		 * * @param {number} totalEvals - Le nombre total d'évaluations.
+		 * */
 		function loadScripts(totalEvals) {
 			for (let i = 1; i <= totalEvals; i++) {
-				const script = "eval" + i + ".js";
-				const scriptElement = document.createElement("script");
-				scriptElement.src = script;
-				document.head.appendChild(scriptElement);
+				const script = "eval" + i + ".js"; // Nom du fichier script
+				const scriptElement = document.createElement("script"); // Création de l'élément <script>
+				scriptElement.src = script; // Attribution du chemin du script
+				document.head.appendChild(scriptElement); // Ajout de l'élément <script> à la balise <head>
 			}
 		}
 
@@ -44,7 +53,7 @@
 			<div class='expert1'>${eval.cartouche.expert1.name}</div>
 			<div class='expert2'>${eval.cartouche.expert2.name}</div>
 			<hr>
-			<div class='boss'>Cdp> ${eval.cartouche.boss.name}</div>`;
+			<div class='boss'>Cdp > ${eval.cartouche.boss.name}</div>`;
 
 			button.appendChild(buttonContent);
 
@@ -62,14 +71,14 @@
 			}, 400);
 		}
 
-
-		// Cette fonction est appelée par le bouton de confirmation de la fenêtre popup.
+		// Cette fonction est déclenchée lorsqu'on clique sur le bouton de confirmation de la fenêtre popup.
 		function addEvaluationsToDatabase() {
 			const isEvalCheckboxChecked = getEtatCheckboxEval();
-			const nombreEvaluations = evalsList.length;
+			const nombreEvaluations = loadedEvaluations.length;
 
 			if (isEvalCheckboxChecked) {
-				enregistrerEvaluationsDansIndexedDB(evalsList);
+				enregistrerEvaluationsDansIndexedDB(loadedEvaluations);
+
 				/* L'instruction reload est précédée d'une suspension de 0 secondes pour permettre l'enregistrement des évaluations dans IndexedDB. 
 				Cette pause garantit que toutes les opérations nécessaires sont effectuées avant de rafraîchir la page, évitant ainsi tout problème potentiel. 
 				Ensuite, la page est rechargée pour actualiser les données affichées, assurant ainsi le bon enregistrement des changements dans la base de données IndexedDB. */
@@ -78,13 +87,13 @@
 				desactiverCheckboxEval();
 
 				if (currentEvalIndex < nombreEvaluations) {
-					saveToIndexedDB(db_Evals, t_Name, evalsList[currentEvalIndex]);
+					saveToIndexedDB(db_Evals, t_Name, loadedEvaluations[currentEvalIndex]);
 				}
 
 				currentEvalIndex++;
 
 				if (currentEvalIndex < nombreEvaluations) {
-					const nomCandidat = evalsList[currentEvalIndex].cartouche.candidate.name;
+					const nomCandidat = loadedEvaluations[currentEvalIndex].cartouche.candidate.name;
 					showModal(`Charger le suivant : ${nomCandidat}`);
 				} else {
 					reinitialiserIndexEval();
@@ -107,11 +116,12 @@
 		function reinitialiserIndexEval() { currentEvalIndex = 0; }
 
 		function loadButtonsEvaluation() {
+
 			const listOfevalsList = document.getElementById("listOfevalsList");
 
 			getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
 
-				debugLog(`evalDB chargée depuis getFromIndexedDB ${JSON.stringify(evalDB)}`);
+				debugLog(`evalDB chargée depuis getFromIndexedDB`);
 
 				if (evalDB) {
 
@@ -119,24 +129,28 @@
 						const button = createEvalButton(eval, index);
 						listOfevalsList.appendChild(button);
 					});
+					databaseEvaluations = evalDB;
 				}
 				else {
-					msgevalsListelector.style.display = "none";
-				}
-			});
+						msgevalsListelector.style.display = "none";
+					}
+				});
 		}
 
 		function displayEvalControls() {
 			const msgevalsListelector = document.getElementById("msgevalsListelector");
 
-			if (evalsList.length > 0) {
+			if (loadedEvaluations.length > 0) {
 				msgevalsListelector.style.display = "block";
-				const content = "Souhaitez-vous importer cette évaluation ?" +
-					evalsList.map((eval) => eval.cartouche.candidate.name).join(", ");
+				const content = "Le programme a trouvé les fichiers d'évaluations suivants. \
+				<br>Veuillez sélectionner ceux que vous souhaitez importer : ";
+
 				showModal(content);
+
 			}
 		}
 
+		// Cette fonction est appelée à l'initialisation de la page
 		document.addEventListener("DOMContentLoaded", () => {
 			loadScripts(totalEvals);
 			loadButtonsEvaluation();
@@ -144,22 +158,29 @@
 			const shouldDisplayPopup = sessionStorage.getItem('shouldDisplayPopup');
 
 			if (shouldDisplayPopup === null) {
+
+				// Si aucune valeur n'est présente dans le sessionStorage,
+				// on l'initialise à 'true' et recharge la page après 3 secondes
 				sessionStorage.setItem('shouldDisplayPopup', 'true');
 				location.reload(3);
 			} else if (shouldDisplayPopup === 'true') {
+
+
+				// Si la valeur dans le sessionStorage est 'true',
+				// on affiche les contrôles d'évaluation après un délai de 200 millisecondes
 				setTimeout(displayEvalControls, 200);
 				sessionStorage.setItem('shouldDisplayPopup', 'false');
 			}
 		});
-	</script>
 
+	</script>
 	<style>
 		:root {
 			--primaryColor: #407BB8;
 			/* Ancienne: #2c3e50 */
-			--secondaryColor: #D3D8DC;
+			--secondaryColor: #a5abb0;
 			/* Ancienne: #bdc3c7 */
-			--successColor: #58C486;
+			--successColor: #2f9b5e;
 			/* Ancienne: #27ae60 */
 			--warningColor: #FAB861;
 			/* Ancienne: #f39c12 */
@@ -184,7 +205,6 @@
 			font-size: 16px;
 			line-height: 1.4;
 			color: var(--textColor);
-
 			padding: 0;
 		}
 
@@ -200,19 +220,20 @@
 
 		#promptOK {
 			display: grid;
-			grid-template-rows: 50% 50% 50%;
+			grid-template-rows: auto auto auto;
 			margin: auto;
 		}
 
 		.confirmButton {
-			grid-row: 3;
+			margin: 0 auto;
 			background-color: var(--primaryColor);
 			border: none;
+			text-align: center;
 			font-size: larger;
 			font-weight: bolder;
 			color: white;
-			width: 70%;
-			margin: 0 auto;
+			min-height: 40px;
+			min-width: 60%;
 		}
 
 		.confirmButton:hover {
@@ -220,13 +241,21 @@
 		}
 
 		.checkbox-container input[type="checkbox"] {
-			width: 18px;
-			height: 18px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 25px;
+			width: 25px;
+			background-color: var(--modalBackgroundColor);
+		}
+
+		.checkbox-container input[type="checkbox"]:hover {
+			background-color: var(--modalTextColor);
 		}
 
 		.checkbox-container {
-			grid: 2;
-			display: flex;
+
+			flex-direction: column;
 			align-items: center;
 			margin-bottom: 15px;
 			padding: 10px;
@@ -236,9 +265,22 @@
 		}
 
 		.checkbox-container label {
-			margin-left: 10px;
-			margin-right: 5px;
+			display: block;
+			margin-left: 5px;
+			margin-right: 10px;
 			font-weight: bold;
+		}
+
+		.loadedEvaluations {
+			display: block;
+			position: relative;
+			padding-left: 35px;
+			margin-bottom: 12px;
+			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
 		}
 
 		#title {
@@ -456,14 +498,14 @@
 			width: 200px;
 			height: 220px;
 			min-height: 120px;
-			padding: 12px;
-			margin: 7px;
+			padding: 10px;
+			margin: 5px;
 			border: none;
 			background-color: var(--primaryColor);
 			color: white;
 			text-align: center;
 			text-decoration: none;
-			font-size: 16px;
+			font-size: 14px;
 			cursor: pointer;
 			transition: background-color 0.3s ease;
 			position: relative;
@@ -602,13 +644,12 @@
 			display: none;
 			position: fixed;
 			z-index: 1;
-			padding-top: 100px;
+			padding-top: 7vh;
 			left: 0;
 			top: 0;
 			width: 100%;
 			height: 100%;
 			overflow: auto;
-			background-color: rgb(0, 0, 0);
 			background-color: rgba(0, 0, 0, 0.4);
 		}
 
@@ -618,9 +659,9 @@
 			min-width: 400px;
 			background-color: var(--modalBackgroundColor);
 			margin: auto;
-			padding: 20px;
-			border: 1px solid #888;
-			width: 80%;
+			padding: 12px;
+			border: 1px solid var(--backgroundColor);
+			width: 75%;
 		}
 
 		.close {
@@ -1103,7 +1144,6 @@
 </body>
 
 <script>
-
 	document.getElementById("printEvalsListDB").addEventListener("click", function () {
 		getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
 			debugLog(`evalDB chargée depuis getFromIndexedDB`);
@@ -1863,7 +1903,7 @@
 		});
 
 		let exportData = {};
-		
+
 		for (let storeName of db.objectStoreNames) {
 			exportData[storeName] = await new Promise((resolve, reject) => {
 				let objectStore = db.transaction(storeName).objectStore(storeName);
@@ -1990,7 +2030,7 @@
 				? // Clé basée sur la sélection du sélecteur
 				`${DEFAULT_KEY_PREFIX}${parseInt(dpdevalsListelector.value) + 1}`
 				: // Clé basée sur le nombre d'évaluations existantes
-				`${DEFAULT_KEY_PREFIX}${evalsList.length + 1}`;
+				`${DEFAULT_KEY_PREFIX}${loadedEvaluations.length + 1}`;
 
 		if (saveToLocal) {
 
@@ -1999,7 +2039,7 @@
 
 		} else {
 			// Télécharger les données au format JSON // Convertir les données en une chaîne JSON
-			var dataStr = "data:text/json;charset=utf-8, evalsList.push(" + encodeURIComponent(JSON.stringify(data)) + ")";
+			var dataStr = "data:text/json;charset=utf-8, loadedEvaluations.push(" + encodeURIComponent(JSON.stringify(data)) + ")";
 			var downloadAnchorNode = document.createElement("a");
 			downloadAnchorNode.setAttribute("href", dataStr);
 			downloadAnchorNode.setAttribute("download", keyOrFilename + ".js");
@@ -2030,36 +2070,120 @@
 		modalContent.appendChild(button);
 	}
 
-	function addCheckBox(labelText) {
+	function addCheckBox() {
+
 		const checkboxContainer = document.createElement("div");
 		checkboxContainer.classList.add("checkbox-container");
 
-		const checkboxLabel = document.createElement("label");
-		checkboxLabel.textContent = labelText;
+		const listOfCheckBox = getDuplicatesAndRecentDates();
 
-		const checkbox = document.createElement("input");
-		checkbox.type = "checkbox";
-		checkbox.addEventListener("change", function () {
-			isEvalCheckboxChecked = checkbox.checked;
-		});
+		for (let i = 0; i < listOfCheckBox.length; i++) {
 
-		if (isEvalCheckboxDisabled) {
-			checkbox.disabled = true;
+			debugLog(`Création de la checkbox :${listOfCheckBox[i].id}, ${listOfCheckBox[i].status} `);
+
+			const elementCheckBox = document.createElement("div");
+			elementCheckBox.classList.add("loadedEvaluations");
+
+			const evaluation = listOfCheckBox[i];
+			const label = document.createElement("label");
+			const status = evaluation.status;
+			const candidateName = evaluation.cartouche.candidate.name;
+			const evaluationId = evaluation.id;
+
+			const checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+
+			checkbox.addEventListener("change", function () {
+				if (status !== 2) {
+					isEvalCheckboxChecked = checkbox.checked;
+				} else {
+					checkbox.checked = false;
+				}
+			});
+
+			switch (status) {
+				case 0:
+					label.innerText = candidateName;
+					label.style.color = "green";
+					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					label.setAttribute("for", "checkbox-" + evaluationId);
+					break;
+				case 1:
+					label.innerText = candidateName;
+					label.style.color = "red";
+					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					label.setAttribute("for", "checkbox-" + evaluationId);
+					break;
+				case 2:
+					label.innerText = candidateName;
+					label.style.color = "blue";
+					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					label.setAttribute("for", "checkbox-" + evaluationId);
+					checkbox.disabled = true;
+					break;
+				default:
+					label.innerText = candidateName + " (Statut inconnu)";
+					label.style.color = "black";
+			}
+
+			elementCheckBox.appendChild(checkbox);
+			elementCheckBox.appendChild(label)
+			checkboxContainer.appendChild(elementCheckBox);
 		}
 
-		checkboxLabel.appendChild(checkbox);
-		checkboxContainer.appendChild(checkboxLabel);
 		modalContent.appendChild(checkboxContainer);
 	}
 
+
+
+	function getDuplicatesAndRecentDates() {
+		const duplicatesWithRecentDates = [];
+
+		console.log(loadedEvaluations);
+
+		debugLog(`Tableau des js : ${loadedEvaluations.length}`);
+		debugLog(`tableau de la DB :${databaseEvaluations.length}`);
+
+		if (!loadedEvaluations || !databaseEvaluations) {
+			return duplicatesWithRecentDates;
+		}
+
+		for (let i = 0; i < loadedEvaluations.length; i++) {
+			const loadedEval = loadedEvaluations[i];
+			const databaseEval = databaseEvaluations.find((eval) => eval.id === loadedEval.id);
+
+			debugLog(`Loaded Evaluation ID: ${loadedEval.id} `);
+			debugLog(`Database Evaluation ID: ${databaseEval ? databaseEval.id : 'Not found'}`);
+
+			if (!databaseEval) {
+				// Évaluation non présente dans la base de données
+				loadedEval.status = 0;
+			} else if (loadedEval.dateLastSave > databaseEval.dateLastSave) {
+
+			
+				// Évaluation présente dans la base de données mais plus récente
+				loadedEval.status = 1;
+			} else {
+				// Évaluation présente dans la BD mais plus ancienne
+				loadedEval.status = 2;
+			}
+			duplicatesWithRecentDates.push(loadedEval);
+		}
+		return duplicatesWithRecentDates;
+	}
+
+
 	function showModal(content) {
+
+		debugLog("appel de showModal");
+
 		const crit = criteria.find((c) => c.id === content);
 
 		modal.style.display = "block";
 
 		if (!crit) {
 			modalContent.innerHTML = content;
-			addCheckBox("Autoriser le chargement de tous les fichiers");
+			addCheckBox();
 			addButton("Confirmer", "confirmButton", onConfirm);
 			modalContent.id = "promptOK";
 
