@@ -861,7 +861,31 @@
       let lastQuestion = allQuestions[allQuestions.length - 1];
       // duplicate and adjust the last question row
       let lastQuestionRow = lastQuestion.parentNode.parentNode;
-      lastQuestionRow.parentNode.appendChild(shiftQuestionRow(lastQuestionRow));
+      let newQuestionRow = shiftQuestionRow(lastQuestionRow);
+      lastQuestionRow.parentNode.appendChild(newQuestionRow);
+      criteria.push({ id: newQuestionRow.id.substring(3) });
+    }
+
+    // Increment all internal ids of the question and returns the result row
+    function shiftQuestionRow(row) {
+      let res = row.cloneNode(true); // deep clone
+      let rowid = parseInt(row.id.substring(4)) + 1; // id for new row
+      let tabindex = parseInt(row.childNodes[1].childNodes[1].tabIndex) + 3;
+      res.id = "rowC" + rowid;
+      res.childNodes[0].innerText = "C" + rowid;
+      res.childNodes[0].id = "C" + rowid;
+      res.childNodes[1].childNodes[0].nodeValue = "Question des experts " + (rowid - 4);
+      res.childNodes[1].childNodes[1].id = "qstC" + rowid;
+      res.childNodes[1].childNodes[1].value = "";
+      res.childNodes[1].childNodes[1].tabIndex = tabindex++;
+      res.childNodes[2].childNodes[0].id = "ptsC" + rowid;
+      res.childNodes[2].childNodes[0].value = null;
+      res.childNodes[2].childNodes[0].tabIndex = tabindex++;
+      res.childNodes[3].childNodes[0].id = "jusC" + rowid;
+      res.childNodes[3].childNodes[0].value = "";
+      res.childNodes[3].childNodes[0].tabIndex = tabindex++;
+      res.childNodes[3].childNodes[0].tabindex = 100 + rowid;
+      return res;
     }
 
     // setup event handlers that will keep the grade accurate
@@ -899,27 +923,6 @@
       divTotal.innerText = total;
       let grade = (total / 120.0) * 5 + 1;
       divGrade.innerText = grade.toFixed(1);
-    }
-
-    // Increment all internal ids of the question and returns the result row
-    function shiftQuestionRow(row) {
-      let res = row.cloneNode(true); // deep clone
-      let rowid = parseInt(row.id.substring(4)) + 1; // id for new row
-      let tabindex = parseInt(row.childNodes[1].childNodes[1].tabIndex) + 3;
-      res.id = "rowC" + rowid;
-      res.childNodes[0].innerText = "C" + rowid;
-      res.childNodes[0].id = "C" + rowid;
-      res.childNodes[1].childNodes[0].nodeValue = "Question des experts " + (rowid - 4);
-      res.childNodes[1].childNodes[1].id = "qstC" + rowid;
-      res.childNodes[1].childNodes[1].value = "";
-      res.childNodes[1].childNodes[1].tabIndex = tabindex++;
-      res.childNodes[2].childNodes[0].id = "ptsC" + rowid;
-      res.childNodes[2].childNodes[0].tabIndex = tabindex++;
-      res.childNodes[3].childNodes[0].id = "jusC" + rowid;
-      res.childNodes[3].childNodes[0].value = "";
-      res.childNodes[3].childNodes[0].tabIndex = tabindex++;
-      res.childNodes[3].childNodes[0].tabindex = 100 + rowid;
-      return res;
     }
 
     // propagate the candidate name in the sheet and workspace
@@ -986,6 +989,17 @@
       txtExpert2Phone.value = data.cartouche.expert2.phone;
       txtExpert2Mail.value = data.cartouche.expert2.mail;
 
+      // questions
+      i = 5;
+      while (typeof data.questions[i - 5] != "undefined") {
+        if (i > 10) {
+          // the row does not exist --> create it
+          duplicateLastQuestionRow();
+        }
+        document.getElementById("qstC" + i).value = data.questions[i - 5];
+        i++;
+      }
+
       // criteria
       for (crit of data.criteria) {
         document.getElementById("pts" + crit.id).value = crit.points;
@@ -996,17 +1010,6 @@
       // specifics
       for (i = 14; i <= 20; i++) {
         document.getElementById("cspA" + i).value = data.specifics[i - 14];
-      }
-
-      // questions
-      i = 5;
-      while (typeof data.questions[i - 5] != "undefined") {
-        if (i > 10) {
-          // the row does not exist --> create it
-          duplicateLastQuestionRow();
-        }
-        document.getElementById("qstC" + i).value = data.questions[i - 5];
-        i++;
       }
 
       // remarks
