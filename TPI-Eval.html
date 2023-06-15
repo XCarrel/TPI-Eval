@@ -21,8 +21,6 @@
 		let currentEvalIndex = 0; // Indice de l'évaluation actuelle
 
 		let isNewEval = false; // Indicateur utilisé pour identifier les évaluations qui n'ont pas d'ID attribué 
-		let isEvalCheckboxChecked = null; // Indicateur si la case à cocher de l'évaluation est cochée
-		let isEvalCheckboxDisabled = null; // Indicateur si la case à cocher de l'évaluation est désactivée
 		let shouldDisplayPopup = null; // Variable contrôlant l'affichage de la popup
 
 		let isEvalJSDuplicated = false; // Indicateur indiquant si l'évaluation de JavaScript est dupliquée ou non
@@ -71,47 +69,13 @@
 			}, 400);
 		}
 
-		// Cette fonction est déclenchée lorsqu'on clique sur le bouton de confirmation de la fenêtre popup.
-		function addEvaluationsToDatabase() {
-			const isEvalCheckboxChecked = getEtatCheckboxEval();
-			const nombreEvaluations = loadedEvaluations.length;
-
-			if (isEvalCheckboxChecked) {
-				enregistrerEvaluationsDansIndexedDB(loadedEvaluations);
-
-				/* L'instruction reload est précédée d'une suspension de 0 secondes pour permettre l'enregistrement des évaluations dans IndexedDB. 
-				Cette pause garantit que toutes les opérations nécessaires sont effectuées avant de rafraîchir la page, évitant ainsi tout problème potentiel. 
-				Ensuite, la page est rechargée pour actualiser les données affichées, assurant ainsi le bon enregistrement des changements dans la base de données IndexedDB. */
-				reloadPageWithDelay();
-			} else {
-				desactiverCheckboxEval();
-
-				if (currentEvalIndex < nombreEvaluations) {
-					saveToIndexedDB(db_Evals, t_Name, loadedEvaluations[currentEvalIndex]);
-				}
-
-				currentEvalIndex++;
-
-				if (currentEvalIndex < nombreEvaluations) {
-					const nomCandidat = loadedEvaluations[currentEvalIndex].cartouche.candidate.name;
-					showModal(`Charger le suivant : ${nomCandidat}`);
-				} else {
-					reinitialiserIndexEval();
-					closeModal();
-					reloadPageWithDelay();
-				}
-			}
-		}
-
 		function enregistrerEvaluationsDansIndexedDB(evals) {
+
+
 			evals.forEach((eval) => {
 				saveToIndexedDB(db_Evals, t_Name, eval);
 			});
 		}
-
-		function getEtatCheckboxEval() { return isEvalCheckboxChecked; }
-
-		function desactiverCheckboxEval() { isEvalCheckboxDisabled = true; }
 
 		function reinitialiserIndexEval() { currentEvalIndex = 0; }
 
@@ -132,9 +96,9 @@
 					databaseEvaluations = evalDB;
 				}
 				else {
-						msgevalsListelector.style.display = "none";
-					}
-				});
+					msgevalsListelector.style.display = "none";
+				}
+			});
 		}
 
 		function displayEvalControls() {
@@ -1151,7 +1115,6 @@
 		});
 	});
 
-
 	// Utilisation de la fonction pour réinitialiser la base de données
 	document.getElementById("eraseEvalsListToDB").addEventListener("click", function () { resetIndexedDB(db_Evals); })
 
@@ -2071,20 +2034,19 @@
 	}
 
 	function addCheckBox() {
-
 		const checkboxContainer = document.createElement("div");
 		checkboxContainer.classList.add("checkbox-container");
 
 		const listOfCheckBox = getDuplicatesAndRecentDates();
 
-		for (let i = 0; i < listOfCheckBox.length; i++) {
+		listOfCheckBox.forEach((evaluation) => {
+			debugLog(`Création de la checkbox : ${evaluation.id}, ${evaluation.status}`);
 
-			debugLog(`Création de la checkbox :${listOfCheckBox[i].id}, ${listOfCheckBox[i].status} `);
+			evaluation.isChecked = null;
 
 			const elementCheckBox = document.createElement("div");
 			elementCheckBox.classList.add("loadedEvaluations");
 
-			const evaluation = listOfCheckBox[i];
 			const label = document.createElement("label");
 			const status = evaluation.status;
 			const candidateName = evaluation.cartouche.candidate.name;
@@ -2095,9 +2057,11 @@
 
 			checkbox.addEventListener("change", function () {
 				if (status !== 2) {
-					isEvalCheckboxChecked = checkbox.checked;
+					evaluation.isChecked = checkbox.checked;
+					debugLog(`ajout isChecked : ${evaluation.id}, ${evaluation.isChecked}`);
 				} else {
 					checkbox.checked = false;
+					evaluation.isChecked = checkbox.checked;
 				}
 			});
 
@@ -2105,19 +2069,19 @@
 				case 0:
 					label.innerText = candidateName;
 					label.style.color = "green";
-					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					checkbox.id = "checkbox-" + evaluationId;
 					label.setAttribute("for", "checkbox-" + evaluationId);
 					break;
 				case 1:
 					label.innerText = candidateName;
 					label.style.color = "red";
-					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					checkbox.id = "checkbox-" + evaluationId;
 					label.setAttribute("for", "checkbox-" + evaluationId);
 					break;
 				case 2:
 					label.innerText = candidateName;
 					label.style.color = "blue";
-					checkbox.setAttribute("id", "checkbox-" + evaluationId);
+					checkbox.id = "checkbox-" + evaluationId;
 					label.setAttribute("for", "checkbox-" + evaluationId);
 					checkbox.disabled = true;
 					break;
@@ -2127,26 +2091,23 @@
 			}
 
 			elementCheckBox.appendChild(checkbox);
-			elementCheckBox.appendChild(label)
+			elementCheckBox.appendChild(label);
 			checkboxContainer.appendChild(elementCheckBox);
-		}
+		});
 
 		modalContent.appendChild(checkboxContainer);
-	}
 
+		return listOfCheckBox;
+	}
 
 
 	function getDuplicatesAndRecentDates() {
 		const duplicatesWithRecentDates = [];
 
-		console.log(loadedEvaluations);
-
 		debugLog(`Tableau des js : ${loadedEvaluations.length}`);
 		debugLog(`tableau de la DB :${databaseEvaluations.length}`);
 
-		if (!loadedEvaluations || !databaseEvaluations) {
-			return duplicatesWithRecentDates;
-		}
+		if (!loadedEvaluations || !databaseEvaluations) { return duplicatesWithRecentDates; }
 
 		for (let i = 0; i < loadedEvaluations.length; i++) {
 			const loadedEval = loadedEvaluations[i];
@@ -2159,8 +2120,6 @@
 				// Évaluation non présente dans la base de données
 				loadedEval.status = 0;
 			} else if (loadedEval.dateLastSave > databaseEval.dateLastSave) {
-
-			
 				// Évaluation présente dans la base de données mais plus récente
 				loadedEval.status = 1;
 			} else {
@@ -2172,7 +2131,6 @@
 		return duplicatesWithRecentDates;
 	}
 
-
 	function showModal(content) {
 
 		debugLog("appel de showModal");
@@ -2183,8 +2141,10 @@
 
 		if (!crit) {
 			modalContent.innerHTML = content;
-			addCheckBox();
-			addButton("Confirmer", "confirmButton", onConfirm);
+
+			const dataToSave = addCheckBox();
+
+			addButton("Confirmer", "confirmButton", () => onConfirm(dataToSave)); // Passer dataToSave comme argument à onConfirm
 			modalContent.id = "promptOK";
 
 		} else {
@@ -2194,13 +2154,28 @@
 		}
 	}
 
-	function onConfirm() {
-		addEvaluationsToDatabase();
-		if (isEvalCheckboxChecked) {
-			closeModal();
-		}
+	function onConfirm(dataToSave) {
+		
+		debugLog("confirmer");
+
+		// Filtrer les évaluations cochées
+		const evaluationsToSave = dataToSave.filter((data) => data.isChecked);
+
+		evaluationsToSave.forEach((evaluation) => {
+			delete evaluation.isChecked;
+			delete evaluation.status;
+		});
+
+		// Enregistrer les évaluations cochées
+		enregistrerEvaluationsDansIndexedDB(evaluationsToSave);
+
+		closeModal();
+
+		// Afficher immédiatement les changements apportés à la base de données
+		reloadPageWithDelay();
 	}
 
+	
 	// Gestionnaire d'événements pour fermer la fenêtre modale en cliquant à l'extérieur
 	window.addEventListener("click", (event) => {
 		// Vérifier si l'élément cible du clic est la fenêtre modale
