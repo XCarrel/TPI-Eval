@@ -39,38 +39,53 @@
 			}
 		}
 
-		function createEvalButton(eval, index) {
-			const button = document.createElement("button");
-			const buttonContent = document.createElement("div");
-			button.id = "eval_" + index;
-			buttonContent.innerHTML = `Éval Num(${index + 1})
-			<br> ${eval.dateLastSave instanceof Date ?eval.dateLastSave.toString() : eval.dateLastSave  }
-			<div class='candidate'>${eval.cartouche.candidate.name}</div>
-			<hr>
-			<div class='expert1'>${eval.cartouche.expert1.name}</div>
-			<div class='expert2'>${eval.cartouche.expert2.name}</div>
-			<hr>
-			<div class='boss'>Cdp > ${eval.cartouche.boss.name}</div>`;
-
-			button.appendChild(buttonContent);
-
-			button.addEventListener("click", () => {
-				tpiEvalCurrent = eval;
-				load(tpiEvalCurrent);
-				showFrom();
-			});
-			return button;
-		}
-
 		function reloadPageWithDelay() {
 			setTimeout(() => {
 				location.reload();
 			}, 400);
 		}
 
+		function createEvalButton(eval, index) {
+			const evalButton = document.createElement("button");
+			evalButton.type = "button";
+
+			const evalButtonContent = document.createElement("div");
+
+			evalButton.id = "eval_" + index;
+			evalButtonContent.innerHTML =
+				`Éval Num(${index + 1})
+			<br> ${eval.dateLastSave instanceof Date ? eval.dateLastSave.toString() : eval.dateLastSave}
+			<div class='candidate'>${eval.cartouche.candidate.name}</div>
+			<hr>
+			<div class='expert1'>Exp1: ${eval.cartouche.expert1.name}</div>
+			<div class='expert2'>Exp2: ${eval.cartouche.expert2.name}</div>
+			<hr>
+			<div class='boss'>Cdp> ${eval.cartouche.boss.name}</div>`;
+
+			const deleteButton = document.createElement("button");
+			deleteButton.type = "button";
+			deleteButton.classList.add("delete-button");
+			// deleteButton.innerHTML="&#10060;"
+
+			evalButton.appendChild(deleteButton);
+			evalButton.appendChild(evalButtonContent);
+
+
+			evalButton.addEventListener("click", () => {
+				tpiEvalCurrent = eval;
+				load(tpiEvalCurrent);
+				showFrom();
+			});
+
+			deleteButton.addEventListener("click", (event) => {
+				event.stopPropagation();
+				
+			});
+
+			return evalButton;
+		}
+
 		function enregistrerEvaluationsDansIndexedDB(evals) {
-
-
 			evals.forEach((eval) => {
 				saveToIndexedDB(db_Evals, t_Name, eval);
 			});
@@ -109,7 +124,6 @@
 				<br>Veuillez sélectionner ceux que vous souhaitez importer : ";
 
 				showModal(content);
-
 			}
 		}
 
@@ -135,8 +149,8 @@
 				sessionStorage.setItem('shouldDisplayPopup', 'false');
 			}
 		});
-
 	</script>
+
 	<style>
 		:root {
 			--primaryColor: #407BB8;
@@ -452,75 +466,84 @@
 		}
 
 		#listOfevalsList {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: flex-start;
+			position: static;
+			display: flexbox;
+			flex-direction: row;
+			margin: 2px;
 		}
 
 		#listOfevalsList button {
 			width: 200px;
 			height: 220px;
-			min-height: 120px;
-			padding: 10px;
 			margin: 5px;
 			border: none;
 			background-color: var(--primaryColor);
 			color: white;
-			text-align: center;
 			text-decoration: none;
 			font-size: 14px;
 			cursor: pointer;
-			transition: background-color 0.3s ease;
 			position: relative;
 			overflow: hidden;
+			transition: box-shadow 0.3s ease;
+			vertical-align: top;
+		}
+
+		#listOfevalsList button .button-content {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
 		}
 
 		#listOfevalsList button .candidate {
-			margin-bottom: 5px;
-			font-weight: bold;
-			background-color: var(--secondaryColor);
+			position: relative;
+			margin-bottom: 0;
 			padding: 8px 12px;
+			background-color: var(--dangerColor);
+			width: 100%;
+			margin-left: -10px;
 		}
 
 		#listOfevalsList button .boss {
-			margin-bottom: 3px;
-			background-color: var(--successColor);
+			margin-top: 0;
 			padding: 8px 12px;
+			background-color: var(--successColor);
+			width: 100%;
+			margin-left: -10px;
 		}
 
 		#listOfevalsList button .expert1,
 		#listOfevalsList button .expert2 {
 			margin-bottom: 3px;
+			text-align: left;
 		}
 
-		#listOfevalsList button::before,
-		#listOfevalsList button::after {
-			content: "";
+		#listOfevalsList button .delete-button {
 			position: absolute;
-			width: 100%;
-			height: 100%;
-			background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%);
-			opacity: 0;
-			transition: opacity 0.3s ease;
+			top: 2px;
+			right: 2px;
+			width: 20px;
+			height: 20px;
+			cursor: pointer;
+			transition: color 0.3s ease;
 		}
 
-		#listOfevalsList button:hover::before,
-		#listOfevalsList button:hover::after {
-			opacity: 1;
+		#listOfevalsList button .delete-button::before {
+			content: '\2716';
 		}
 
-		#listOfevalsList button::before {
-			top: 0;
+		#listOfevalsList button:hover{
+			box-shadow: 0 0 9px rgba(0, 0, 0, 0.9);
+			border: 1px solid Gainsboro;
+		}
+		#listOfevalsList button .delete-button:hover {
+			box-shadow: none;
+			border: none;
 		}
 
-		#listOfevalsList button::after {
-			bottom: 0;
+		#listOfevalsList button .delete-button:hover {
+			color: var(--dangerColor);
 		}
-
-		#listOfevalsList button:hover {
-			background-color: var(--titleHover);
-		}
-
 
 		.button {
 			display: inline-block;
@@ -1110,7 +1133,6 @@
 	document.getElementById("printEvalsListDB").addEventListener("click", function () {
 		getFromIndexedDB(db_Evals, t_Name, function (evalDB) {
 			debugLog(`evalDB chargée depuis getFromIndexedDB`);
-
 		});
 	});
 
@@ -1476,59 +1498,6 @@
 		contextualize();
 	});
 
-	function checkLocalStorageData() {
-		let i = 1;
-		let key = `eval${i}`;
-		let myData = localStorage.getItem(key);
-
-		while (myData !== null) {
-
-			debugLog(`La clé ${key} existe dans le localStorage. Sa valeur est : ${myData}`)
-			debugLog(`Ajout d'une option sélect`);
-
-			const data = JSON.parse(myData);
-
-			let optionExists = false;
-			for (let j = 0; j < options.length; j++) {
-				if (options[j].value === String(i - 1)) {
-					optionExists = true;
-					break;
-				}
-			}
-
-			if (!optionExists) {
-				const opt = document.createElement("option");
-				opt.innerText = data.cartouche.candidate.name;
-				opt.value = i - 1;
-				appendChild(opt);
-			}
-
-			let evalExists = evalsList.some(
-				(e) => JSON.stringify(e) === JSON.stringify(data)
-			);
-			if (!evalExists) {
-				evalsList.push(data);
-			}
-
-			i++;
-			key = `eval${i}`;
-			myData = localStorage.getItem(key);
-		}
-
-		if (evalsList.length > 0) {
-			divSelector.classList.remove("d-none");
-			divPage.classList.add("d-none");
-		} else {
-			debugLog("Pas de données locales ", value);
-
-			setTimeout(function () {
-				divSelector.classList.add("d-none");
-				divPage.classList.remove("d-none");
-				load(evalsList[dpdevalsListelector.value]);
-			}, 2000);
-		}
-	}
-
 	cmdEmpty.addEventListener("click", function () {
 		isNewEval = true;
 		showFrom();
@@ -1539,14 +1508,11 @@
 		divPage.classList.remove("d-none");
 	}
 
-	// Add the event listener
 	document.getElementById("cmdFreeze").addEventListener("click", function handleClick() {
 		// Hide the button to indicate it's frozen
 		hideButton();
-
 		// Save data and get the filename
 		saveData(true, false);
-
 		// Freeze the sheet
 		freezeSheet();
 	});
@@ -1624,19 +1590,21 @@
 		if (data.frozen) freezeSheet();
 	}
 
-
 	cmdGetFile.addEventListener("click", function () { saveData(false, false); });
 
 	cmdSave.addEventListener("click", function () { saveData(false, true); });
 
 	function generateUniqueId() {
 		let timestamp = Date.now().toString();
-		timestamp = timestamp.substring(timestamp.length - 4); // Prendre les 4 derniers chiffres du timestamp
+		// Prendre les 4 derniers chiffres du timestamp
+		timestamp = timestamp.substring(timestamp.length - 4);
 
 		let randomNum = Math.random().toString();
-		randomNum = randomNum.substring(randomNum.length - 4); // Prendre les 4 derniers chiffres du nombre aléatoire
+		// Prendre les 4 derniers chiffres du nombre aléatoire
+		randomNum = randomNum.substring(randomNum.length - 4);
 
-		counter++; // Incrémenter le compteur
+		// Incrémenter le compteur
+		counter++;
 		let counterStr = counter.toString();
 
 		// Concaténer et retourner le résultat
@@ -1733,15 +1701,6 @@
 			questions: questionsData,
 			remarks: txtRemarks.value,
 		};
-	}
-
-	function saveToLocalStorage(key, data) {
-		// Convertir les données en JSON et les sauvegarder dans le localStorage
-		localStorage.setItem(key, JSON.stringify(data));
-
-		debugLog(`Données sauvegardées dans le LocalStorage avec la clé : ${key}`);
-		debugLog(`Test : ${localStorage.getItem(key)}`);
-		debugLog("Contenu :", localStorage);
 	}
 
 	function saveToIndexedDB(dbName, storeName, data) {
