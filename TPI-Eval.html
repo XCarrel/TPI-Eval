@@ -853,12 +853,16 @@
 
     // setup event handler for add question button
     cmdAddQuestion.addEventListener("click", () => {
+      duplicateLastQuestionRow();
+    });
+
+    function duplicateLastQuestionRow() {
       let allQuestions = document.getElementsByClassName("question");
       let lastQuestion = allQuestions[allQuestions.length - 1];
       // duplicate and adjust the last question row
       let lastQuestionRow = lastQuestion.parentNode.parentNode;
       lastQuestionRow.parentNode.appendChild(shiftQuestionRow(lastQuestionRow));
-    });
+    }
 
     // setup event handlers that will keep the grade accurate
     for (inputpoints of document.getElementsByClassName("points")) {
@@ -995,8 +999,14 @@
       }
 
       // questions
-      for (i = 5; i <= 10; i++) {
+      i = 5;
+      while (typeof data.questions[i - 5] != "undefined") {
+        if (i > 10) {
+          // the row does not exist --> create it
+          duplicateLastQuestionRow();
+        }
         document.getElementById("qstC" + i).value = data.questions[i - 5];
+        i++;
       }
 
       // remarks
@@ -1046,8 +1056,9 @@
 
       // questions
       data.questions = [];
-      for (i = 5; i <= 10; i++) {
-        data.questions.push(document.getElementById("qstC" + i).value);
+      i = 5;
+      while ((q = document.getElementById("qstC" + i++))) {
+        data.questions.push(q.value);
       }
 
       // add remarks
