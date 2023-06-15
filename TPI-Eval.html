@@ -43,9 +43,8 @@
 			const button = document.createElement("button");
 			const buttonContent = document.createElement("div");
 			button.id = "eval_" + index;
-
 			buttonContent.innerHTML = `Éval Num(${index + 1})
-			<br> ${eval.dateLastSave}
+			<br> ${eval.dateLastSave.toLocaleDateString()}
 			<div class='candidate'>${eval.cartouche.candidate.name}</div>
 			<hr>
 			<div class='expert1'>${eval.cartouche.expert1.name}</div>
@@ -1696,14 +1695,16 @@
 			(_, i) => document.getElementById(`questionC${i + 5}`).value
 		);
 
-		date = new Date().toLocaleDateString();
+		const currentDate = new Date();
+
+		debugLog(`Date actuelle : ${currentDate}`);
 
 		if (isNewEval) { id = generateUniqueId(); }
 		else { id = tpiEvalCurrent.id; }
 
 		return {
 			id: id,
-			dateLastSave: date,
+			dateLastSave: currentDate,
 			frozen: final,
 			cartouche: {
 				boss: {
@@ -1814,7 +1815,6 @@
 			debugLog(`Erreur lors de l'ouverture de la base de données : ${event.target.error}`);
 		};
 	}
-
 
 	function getFromIndexedDB(dbName, storeName, callback) {
 		let request = indexedDB.open(dbName);
