@@ -1821,7 +1821,7 @@
 
 		request.onupgradeneeded = function (event) {
 			console.log("La base de données n'existe pas.");
-			request.deleteDatabase(dbName);
+			indexedDB.deleteDatabase(dbName);
 			callback(false);
 		};
 
@@ -2132,7 +2132,6 @@
 	}
 
 	function showModal(content) {
-
 		debugLog("appel de showModal");
 
 		const crit = criteria.find((c) => c.id === content);
@@ -2140,22 +2139,47 @@
 		modal.style.display = "block";
 
 		if (!crit) {
-			modalContent.innerHTML = content;
-
-			const dataToSave = addCheckBox();
-
-			addButton("Confirmer", "confirmButton", () => onConfirm(dataToSave)); // Passer dataToSave comme argument à onConfirm
-			modalContent.id = "promptOK";
-
+			showEvaluationsContent(content);
 		} else {
-			modalContent.id = "divModalContent";
-			modalContent.style.overflowY = "auto";
-			modalContent.innerHTML = crit.help;
+			showCriteriaHelpContent(crit.help);
 		}
 	}
 
+	function showEvaluationsContent(content) {
+		modalContent.innerHTML = content;
+
+		const dataToSave = addCheckBox();
+
+		addButton("Confirmer", "confirmButton", () => onConfirm(dataToSave));
+		modalContent.id = "promptOK";
+	}
+
+	function showCriteriaHelpContent(helpText) {
+		modalContent.id = "divModalContent";
+		modalContent.style.overflowY = "auto";
+		modalContent.innerHTML = helpText;
+	}
+
 	function onConfirm(dataToSave) {
-		
+		debugLog("confirmer");
+
+		const evaluationsToSave = dataToSave.filter((data) => data.isChecked);
+
+		evaluationsToSave.forEach((evaluation) => {
+			delete evaluation.isChecked;
+			delete evaluation.status;
+		});
+
+		enregistrerEvaluationsDansIndexedDB(evaluationsToSave);
+
+		closeModal();
+
+		reloadPageWithDelay();
+	}
+
+
+	function onConfirm(dataToSave) {
+
 		debugLog("confirmer");
 
 		// Filtrer les évaluations cochées
@@ -2175,7 +2199,7 @@
 		reloadPageWithDelay();
 	}
 
-	
+
 	// Gestionnaire d'événements pour fermer la fenêtre modale en cliquant à l'extérieur
 	window.addEventListener("click", (event) => {
 		// Vérifier si l'élément cible du clic est la fenêtre modale
