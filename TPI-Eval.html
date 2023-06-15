@@ -44,7 +44,7 @@
 			const buttonContent = document.createElement("div");
 			button.id = "eval_" + index;
 			buttonContent.innerHTML = `Éval Num(${index + 1})
-			<br> ${eval.dateLastSave.toLocaleDateString()}
+			<br> ${eval.dateLastSave instanceof Date ?eval.dateLastSave.toString() : eval.dateLastSave  }
 			<div class='candidate'>${eval.cartouche.candidate.name}</div>
 			<hr>
 			<div class='expert1'>${eval.cartouche.expert1.name}</div>
