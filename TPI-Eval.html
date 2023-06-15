@@ -759,7 +759,7 @@
       if (e.key == "Escape") modal.style.display = "none";
     });
 
-    // Build the tables
+    // Build the tables in sections A, B and C
     for (item of criteria) {
       let r = document.createElement("div");
       r.className = "row";
@@ -792,9 +792,8 @@
       }
 
       // Add text input for the question
-      if (item.id.charAt(0) == "C" && parseInt(item.id.substring(1)) >= 5 && parseInt(item.id.substring(1)) <= 10) {
-        let question = document.createElement("input");
-        question.type = "text";
+      if (item.id.charAt(0) == "C" && parseInt(item.id.substring(1)) >= 5) {
+        let question = document.createElement("textarea");
         question.id = "qst" + item.id;
         question.tabIndex = tabindex++;
         question.addEventListener("focus", function (e) {
