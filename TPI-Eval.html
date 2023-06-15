@@ -310,6 +310,7 @@
           <div class="cell header col-7">Justification</div>
         </div>
       </div>
+      <button id="cmdAddQuestion">+</button>
       <!-- ======================================================================================== -->
 
       <h2 class="pagebreak">Contraction</h2>
@@ -795,6 +796,7 @@
       if (item.id.charAt(0) == "C" && parseInt(item.id.substring(1)) >= 5) {
         let question = document.createElement("textarea");
         question.id = "qst" + item.id;
+        question.className = "question"; // no styling used for add/remove questions
         question.tabIndex = tabindex++;
         question.addEventListener("focus", function (e) {
           helpcontext = e.target.id.substring(3);
@@ -802,6 +804,7 @@
         cname.appendChild(question);
       }
 
+      // Points
       let cpts = document.createElement("div");
       cpts.className = "cell col-1 center";
       let numcpts = document.createElement("input");
@@ -848,6 +851,15 @@
       }
     }
 
+    // setup event handler for add question button
+    cmdAddQuestion.addEventListener("click", () => {
+      let allQuestions = document.getElementsByClassName("question");
+      let lastQuestion = allQuestions[allQuestions.length - 1];
+      // duplicate and adjust the last question row
+      let lastQuestionRow = lastQuestion.parentNode.parentNode;
+      lastQuestionRow.parentNode.appendChild(shiftQuestionRow(lastQuestionRow));
+    });
+
     // setup event handlers that will keep the grade accurate
     for (inputpoints of document.getElementsByClassName("points")) {
       inputpoints.addEventListener("change", function (e) {
@@ -883,6 +895,27 @@
       divTotal.innerText = total;
       let grade = (total / 120.0) * 5 + 1;
       divGrade.innerText = grade.toFixed(1);
+    }
+
+    // Increment all internal ids of the question and returns the result row
+    function shiftQuestionRow(row) {
+      let res = row.cloneNode(true); // deep clone
+      let rowid = parseInt(row.id.substring(4)) + 1; // id for new row
+      let tabindex = parseInt(row.childNodes[1].childNodes[1].tabIndex) + 3;
+      res.id = "rowC" + rowid;
+      res.childNodes[0].innerText = "C" + rowid;
+      res.childNodes[0].id = "C" + rowid;
+      res.childNodes[1].childNodes[0].nodeValue = "Question des experts " + (rowid - 4);
+      res.childNodes[1].childNodes[1].id = "qstC" + rowid;
+      res.childNodes[1].childNodes[1].value = "";
+      res.childNodes[1].childNodes[1].tabIndex = tabindex++;
+      res.childNodes[2].childNodes[0].id = "ptsC" + rowid;
+      res.childNodes[2].childNodes[0].tabIndex = tabindex++;
+      res.childNodes[3].childNodes[0].id = "jusC" + rowid;
+      res.childNodes[3].childNodes[0].value = "";
+      res.childNodes[3].childNodes[0].tabIndex = tabindex++;
+      res.childNodes[3].childNodes[0].tabindex = 100 + rowid;
+      return res;
     }
 
     // propagate the candidate name in the sheet and workspace
