@@ -111,6 +111,14 @@
         width: 70px;
         margin: 3px;
       }
+      .delbutton {
+        background-color: red;
+        color: white;
+        font-weight: bolder;
+        border: none;
+        border-radius: 50%;
+        float: right;
+      }
       @media print {
         .pagebreak {
           page-break-before: always;
@@ -863,7 +871,8 @@
       let lastQuestionRow = lastQuestion.parentNode.parentNode;
       let newQuestionRow = shiftQuestionRow(lastQuestionRow);
       lastQuestionRow.parentNode.appendChild(newQuestionRow);
-      criteria.push({ id: newQuestionRow.id.substring(3) });
+      criteria.push({ id: newQuestionRow.id.substring(3) }); // so that it will be saved
+      addRemoveButtons();
     }
 
     // Increment all internal ids of the question and returns the result row
@@ -1018,6 +1027,30 @@
       contextualize();
 
       if (data.frozen) freezeSheet();
+    }
+
+    // Add the remove buttons to all questions if there are more than 6 questions
+    function addRemoveButtons() {
+      let questions = document.querySelectorAll('[id^="C"]');
+      removeRemoveButtons();
+      if (questions.length > 10) {
+        // too many questions
+        for (i = 4; i <= questions.length - 1; i++) {
+          // start at 4 to ignore the first Cxx criteria that are not questions
+          let delButton = document.createElement("button");
+          delButton.innerText = "x";
+          delButton.className = "delbutton";
+          questions[i].appendChild(delButton);
+        }
+      }
+    }
+
+    // remove all delete buttons
+    function removeRemoveButtons() {
+      let buttons = document.getElementsByClassName("delbutton");
+      for (i = buttons.length - 1; i > 0; i--) {
+        buttons[1].remove();
+      }
     }
 
     // Save content to file
