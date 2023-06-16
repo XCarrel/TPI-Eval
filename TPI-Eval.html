@@ -112,11 +112,9 @@
         margin: 3px;
       }
       .delbutton {
-        background-color: red;
-        color: white;
-        font-weight: bolder;
+        background-color: white;
+        color: red;
         border: none;
-        border-radius: 50%;
         float: right;
       }
       @media print {
@@ -787,6 +785,7 @@
       let cname = document.createElement("div");
       cname.className = "cell col-7";
       cname.innerText = item.title;
+      cname.id = "nam" + item.id;
 
       // Add text input for specific criteria
       if (item.id.charAt(0) == "A" && parseInt(item.id.substring(1)) >= 14 && parseInt(item.id.substring(1)) <= 20) {
@@ -1031,15 +1030,19 @@
 
     // Add the remove buttons to all questions if there are more than 6 questions
     function addRemoveButtons() {
-      let questions = document.querySelectorAll('[id^="C"]');
+      let questions = document.querySelectorAll('[id^="namC"]');
       removeRemoveButtons();
       if (questions.length > 10) {
         // too many questions
         for (i = 4; i <= questions.length - 1; i++) {
           // start at 4 to ignore the first Cxx criteria that are not questions
           let delButton = document.createElement("button");
-          delButton.innerText = "x";
+          delButton.innerText = "✖";
+          delButton.id = "delQ" + (i + 1);
           delButton.className = "delbutton";
+          delButton.addEventListener("click", (e) => {
+            deleteQuestion(e.target.id.substring(4));
+          });
           questions[i].appendChild(delButton);
         }
       }
@@ -1048,9 +1051,26 @@
     // remove all delete buttons
     function removeRemoveButtons() {
       let buttons = document.getElementsByClassName("delbutton");
-      for (i = buttons.length - 1; i > 0; i--) {
-        buttons[1].remove();
+      for (i = buttons.length - 1; i >= 0; i--) {
+        buttons[i].remove();
       }
+      criteria.pop(); // for proper saving
+    }
+
+    // handle delete button click
+    function deleteQuestion(qid) {
+      let qsts = document.querySelectorAll('[id^="qstC"]');
+      let ptss = document.querySelectorAll('[id^="ptsC"]');
+      let juss = document.querySelectorAll('[id^="jusC"]');
+      // shift fields content up
+      for (i = qid - 5; i < qsts.length - 1; i++) {
+        qsts[i].value = qsts[i + 1].value;
+        ptss[i + 4].value = ptss[i + 5].value;
+        juss[i + 4].value = juss[i + 5].value;
+      }
+      // Now remove last line
+      document.getElementById("rowC" + (qsts.length + 4)).remove();
+      addRemoveButtons(); // in case they are no longer needed
     }
 
     // Save content to file
