@@ -18,3 +18,8 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 - Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Cela a pour effet de télécharger un fichier 'eval\<x>.js'. **Déplace ce fichier dans le dossier de TPI-Eval (remplace l'existant)**
 - Quand c'est fini, tu cliques 'finaliser', ça télécharge un ficher 'Eval TPI - \<candidat>.js et la met en lecture seule.
 - Tu l'imprimes depuis le navigateur
+
+## Astuces
+
+### Désactiver le message d’avertissement au téléchargement sur M$Edge
+Lancer [ce script](edgeAllowJs.reg)

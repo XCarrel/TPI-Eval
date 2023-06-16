@@ -1126,7 +1126,7 @@
       saveData(false);
     });
 
-    function saveData(final) {
+    function saveData(final,autosave=false) {
       data = {
         frozen: final,
         cartouche: {
@@ -1170,11 +1170,10 @@
       if (final) {
         filename = "Eval TPI " + txtCandidate.value + ".js";
       } else {
-        if (dpdEvalSelector.value >= 0) {
-          filename = "eval" + (parseInt(dpdEvalSelector.value) + 1) + ".js";
-        } else {
-          filename = "eval" + (evals.length + 1) + ".js";
-        }
+        //Filename friendly add date for autosave
+        let autoSaveSuffix = autosave?'-autosave-'+new Date().toLocaleString().replace(/(.+) (.*):(.*):(.*)/,"$1_$2h$3m$4s")+"-":'';
+
+        filename = `eval${1+(dpdEvalSelector.value >=0?parseInt(dpdEvalSelector.value):evals.length)}${autoSaveSuffix}.js`;
       }
 
       // and now save as downloaded json file
@@ -1217,5 +1216,15 @@
         modal.style.display = "none";
       }
     };
+	
+	//Prevent accidental close/reload without saving...
+	window.addEventListener('beforeunload', function (e) {
+		//force autosave on close (just in case of)...
+		saveData(false,true);
+		
+		//Send default confirm popup
+        e.preventDefault();
+        e.returnValue = '';
+    });
   </script>
 </html>
