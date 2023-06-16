@@ -869,6 +869,10 @@
       // duplicate and adjust the last question row
       let lastQuestionRow = lastQuestion.parentNode.parentNode;
       let newQuestionRow = shiftQuestionRow(lastQuestionRow);
+      // Set event handler on points (not copied in cloning operation)
+      newQuestionRow.childNodes[2].childNodes[0].addEventListener("change", function (e) {
+        checkInputPoints(e.target);
+      });
       lastQuestionRow.parentNode.appendChild(newQuestionRow);
       criteria.push({ id: newQuestionRow.id.substring(3) }); // so that it will be saved
       addRemoveButtons();
@@ -899,10 +903,14 @@
     // setup event handlers that will keep the grade accurate
     for (inputpoints of document.getElementsByClassName("points")) {
       inputpoints.addEventListener("change", function (e) {
-        if (e.target.value > 3) e.target.value = 3;
-        if (e.target.value < 0) e.target.value = 0;
-        computeGrade();
+        checkInputPoints(e.target);
       });
+    }
+
+    function checkInputPoints(input) {
+      if (input.value > 3) input.value = 3;
+      if (input.value < 0) input.value = 0;
+      computeGrade();
     }
 
     // Compute and display the grades, doing sub totals per part
@@ -1015,7 +1023,7 @@
       }
       computeGrade();
 
-      // specifics
+      // Text of specific criteria
       for (i = 14; i <= 20; i++) {
         document.getElementById("cspA" + i).value = data.specifics[i - 14];
       }
@@ -1071,6 +1079,7 @@
       // Now remove last line
       document.getElementById("rowC" + (qsts.length + 4)).remove();
       addRemoveButtons(); // in case they are no longer needed
+      computeGrade(); // we may have deleted points
     }
 
     // Save content to file
