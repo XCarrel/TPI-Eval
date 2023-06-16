@@ -53,7 +53,7 @@
 
 			evalButton.id = "eval_" + eval.id;
 			evalButtonContent.innerHTML = `Éval Num(${index + 1})
-			<br> ${eval.dateLastSave instanceof Date ? eval.dateLastSave.toString() : eval.dateLastSave}
+			<br> ${eval.dateLastSave instanceof Date ? eval.dateLastSave.toLocaleDateString() : eval.dateLastSave}
 			<div class='candidate'>${eval.cartouche.candidate.name}</div>
 			<hr>
 			<div class='expert1'>Exp1: ${eval.cartouche.expert1.name}</div>
@@ -1635,7 +1635,7 @@
 		let counterStr = counter.toString();
 
 		// Concaténer et retourner le résultat
-		return parent(timestamp + randomNum + counterStr);
+		return parseInt(timestamp + randomNum + counterStr);
 	}
 
 	function resetIndexedDB(dbName, storeName) {
