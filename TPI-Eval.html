@@ -105,7 +105,16 @@
       .button {
         padding: 10px;
         border-radius: 4px;
-        background-color: cornflowerblue;
+        background-color: #1e81b0;
+        text-align: center;
+        color: white;
+        width: 70px;
+        margin: 3px;
+      }
+      .disabledbutton {
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #6f9fb6;
         text-align: center;
         color: white;
         width: 70px;
@@ -939,6 +948,7 @@
       divTotal.innerText = total;
       let grade = (total / 120.0) * 5 + 1;
       divGrade.innerText = grade.toFixed(1);
+      isCloseable();
     }
 
     // propagate the candidate name in the sheet and workspace
@@ -960,12 +970,15 @@
     cmdEmpty.addEventListener("click", function () {
       divSelector.className = "d-none";
       divPage.classList.remove("d-none");
+      isCloseable();
     });
     // Finalize sheet by turning all inputs into their text value
     cmdFreeze.addEventListener("click", function () {
-      cmdFreeze.style.display = "none"; // so the save function knows it's frozen
-      saveData(true);
-      freezeSheet();
+      if (isCloseable()) {
+        cmdFreeze.style.display = "none"; // so the save function knows it's frozen
+        saveData(true);
+        freezeSheet();
+      }
     });
 
     function freezeSheet() {
@@ -1080,6 +1093,29 @@
       document.getElementById("rowC" + (qsts.length + 4)).remove();
       addRemoveButtons(); // in case they are no longer needed
       computeGrade(); // we may have deleted points
+    }
+
+    function isCloseable() {
+      let inputPoints = document.getElementsByClassName("points");
+      let res = true; // assumption
+      if (inputPoints.length > 40) {
+        cmdFreeze.title = "Il reste trop de questions dans la section C";
+        res = false;
+      } else {
+        for (input of inputPoints) {
+          if (input.value == "") {
+            res = false;
+            cmdFreeze.title = "Certains critères n'ont pas de points attribués";
+          }
+        }
+      }
+      if (res) {
+        cmdFreeze.title = "Met l'évaluation en lecture seule et télécharge le fichier sour le nom du candidat";
+        cmdFreeze.className = "button";
+      } else {
+        cmdFreeze.className = "disabledbutton";
+      }
+      return res;
     }
 
     // Save content to file
