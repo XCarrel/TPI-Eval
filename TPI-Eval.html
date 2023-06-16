@@ -51,9 +51,8 @@
 
 			const evalButtonContent = document.createElement("div");
 
-			evalButton.id = "eval_" + index;
-			evalButtonContent.innerHTML =
-				`Éval Num(${index + 1})
+			evalButton.id = "eval_" + eval.id;
+			evalButtonContent.innerHTML = `Éval Num(${index + 1})
 			<br> ${eval.dateLastSave instanceof Date ? eval.dateLastSave.toString() : eval.dateLastSave}
 			<div class='candidate'>${eval.cartouche.candidate.name}</div>
 			<hr>
@@ -70,7 +69,6 @@
 			evalButton.appendChild(deleteButton);
 			evalButton.appendChild(evalButtonContent);
 
-
 			evalButton.addEventListener("click", () => {
 				tpiEvalCurrent = eval;
 				load(tpiEvalCurrent);
@@ -79,13 +77,21 @@
 
 			deleteButton.addEventListener("click", (event) => {
 				event.stopPropagation();
-				
-			});
 
+				// Récupérer la clé de la base de données liée à cette évaluation
+				const evalId = event.target.parentNode.id;
+
+				// Extraire l'index à partir de l'ID
+				const id = parseInt(evalId.split("_")[1]);
+
+				debugLog(`suppresion en cours id : ${id}`);
+
+				showModal("Êtes-vous sûr de vouloir supprimer cet élément ?", true, id);
+			});
 			return evalButton;
 		}
 
-		function enregistrerEvaluationsDansIndexedDB(evals) {
+		function saveEvaluationsToIndexedDB(evals) {
 			evals.forEach((eval) => {
 				saveToIndexedDB(db_Evals, t_Name, eval);
 			});
@@ -211,6 +217,25 @@
 			color: white;
 			min-height: 40px;
 			min-width: 60%;
+		}
+
+		.confirmDelete {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			align-items: center;
+			background-color: var(--dangerColor);
+			border: none;
+			text-align: center;
+			font-size: larger;
+			font-weight: bolder;
+			color: white;
+			min-height: 40px;
+			width: 100%;
+		}
+		
+		.confirmDelete:hover {
+			background-color: var(--secondaryColor);
 		}
 
 		.confirmButton:hover {
@@ -532,10 +557,11 @@
 			content: '\2716';
 		}
 
-		#listOfevalsList button:hover{
+		#listOfevalsList button:hover {
 			box-shadow: 0 0 9px rgba(0, 0, 0, 0.9);
 			border: 1px solid Gainsboro;
 		}
+
 		#listOfevalsList button .delete-button:hover {
 			box-shadow: none;
 			border: none;
@@ -708,7 +734,7 @@
 					Supprimer ses évaluations
 				</div>
 
-				<div class="optionMenu" id="printEvalsListDB">
+				<div class="optionMenu" id="printEvalsListDB" style="display: none;">
 					Consulter le contenu de la bd
 				</div>
 
@@ -1595,6 +1621,7 @@
 	cmdSave.addEventListener("click", function () { saveData(false, true); });
 
 	function generateUniqueId() {
+
 		let timestamp = Date.now().toString();
 		// Prendre les 4 derniers chiffres du timestamp
 		timestamp = timestamp.substring(timestamp.length - 4);
@@ -1608,7 +1635,7 @@
 		let counterStr = counter.toString();
 
 		// Concaténer et retourner le résultat
-		return timestamp + randomNum + counterStr;
+		return parent(timestamp + randomNum + counterStr);
 	}
 
 	function resetIndexedDB(dbName, storeName) {
@@ -1644,7 +1671,6 @@
 	}
 
 	function buildData(final) {
-
 		let id;
 
 		const criteriaData = criteria.map((crit) => ({
@@ -1702,6 +1728,71 @@
 			remarks: txtRemarks.value,
 		};
 	}
+
+	function deleteFromIndexedDB(dbName, storeName, id) {
+		let request = indexedDB.open(dbName);
+
+		debugLog(`Delete IndexedDB id: ${id}`);
+
+		request.onsuccess = function (event) {
+			let db = event.target.result;
+
+			if (!db.objectStoreNames.contains(storeName)) {
+				console.log(`Le magasin d'objets '${storeName}' n'existe pas.`);
+				return;
+			}
+
+			const transaction = db.transaction(storeName, "readwrite");
+			const store = transaction.objectStore(storeName);
+
+			const getRequest = store.openCursor();
+
+			getRequest.onsuccess = function (event) {
+
+				const cursor = event.target.result;
+
+				if (cursor) {
+
+					const key = cursor.key;
+					const value = cursor.value;
+
+					if (parseInt(value.id) === id) {
+						const deleteRequest = store.delete(key);
+						deleteRequest.onsuccess = function (event) {
+							console.log("Élément supprimé avec succès de IndexedDB");
+						};
+
+						deleteRequest.onerror = function (event) {
+							console.log(`Erreur lors de la suppression de l'élément : ${event.target.error}`);
+						};
+					}
+
+					cursor.continue();
+
+				} else {
+					console.log(`Aucun élément trouvé avec la clé ${id}`);
+				}
+			};
+
+			getRequest.onerror = function (event) {
+				console.log(`Erreur lors de la récupération de l'élément : ${event.target.error}`);
+			};
+
+			transaction.oncomplete = function () {
+				console.log("Transaction terminée");
+				reloadPageWithDelay();
+			};
+
+			transaction.onerror = function (event) {
+				console.log(`Erreur lors de la transaction : ${event.target.error}`);
+			};
+		};
+
+		request.onerror = function (event) {
+			console.log(`Erreur lors de l'ouverture de la base de données : ${event.target.error}`);
+		};
+	}
+
 
 	function saveToIndexedDB(dbName, storeName, data) {
 		let request = indexedDB.open(dbName);
@@ -1876,13 +1967,12 @@
 		}
 	});
 
-
-	function importDB(dbName, importData) {
+		function importDB(dbName, importData) {
 		// Ouvrir (ou créer) la base de données
 		let request = indexedDB.open(dbName);
 
 		request.onupgradeneeded = function (e) {
-			// Créer les object stores si nécessaire
+			// Créer les objects stores si nécessaire
 			let db = e.target.result;
 			for (let storeName in importData) {
 				if (!db.objectStoreNames.contains(storeName)) {
@@ -2090,18 +2180,47 @@
 		return duplicatesWithRecentDates;
 	}
 
-	function showModal(content) {
+	function clearModalContent() {
+		const checkboxContainer = modalContent.querySelector(".checkbox-container");
+
+		if (checkboxContainer) {
+			modalContent.removeChild(checkboxContainer);
+		}
+	}
+
+	function onConfirmDelete(id) {
+		return function () {
+			deleteFromIndexedDB(db_Evals, t_Name, id);
+			closeModal();
+		};
+	}
+
+	function showModal(content, deleteConfirme = false, id = null) {
 		debugLog("appel de showModal");
 
 		const crit = criteria.find((c) => c.id === content);
 
 		modal.style.display = "block";
 
-		if (!crit) {
+		if (!crit && !deleteConfirme) {
 			showEvaluationsContent(content);
+		} else if (deleteConfirme) {
+			showDeleteConfirmation(content, id);
 		} else {
 			showCriteriaHelpContent(crit.help);
 		}
+	}
+
+	function showDeleteConfirmation(content, id) {
+		debugLog(`deleteConfirme : ${id}`);
+
+		const confirmButton = document.createElement("button");
+		confirmButton.innerText = "Confirmer";
+		confirmButton.classList.add("confirmDelete");
+		confirmButton.addEventListener("click", onConfirmDelete(id));
+
+		modalContent.innerHTML = content + "<br>";
+		modalContent.appendChild(confirmButton);
 	}
 
 	function showEvaluationsContent(content) {
@@ -2113,6 +2232,7 @@
 		modalContent.id = "promptOK";
 	}
 
+
 	function showCriteriaHelpContent(helpText) {
 		modalContent.id = "divModalContent";
 		modalContent.style.overflowY = "auto";
@@ -2122,40 +2242,15 @@
 	function onConfirm(dataToSave) {
 		debugLog("confirmer");
 
-		const evaluationsToSave = dataToSave.filter((data) => data.isChecked);
+		if (dataToSave && dataToSave.length > 0) {
+			const evaluationsToSave = dataToSave
+				.filter(data => data.isChecked)
+				.map(({ isChecked, status, ...evaluation }) => evaluation);
 
-		evaluationsToSave.forEach((evaluation) => {
-			delete evaluation.isChecked;
-			delete evaluation.status;
-		});
-
-		enregistrerEvaluationsDansIndexedDB(evaluationsToSave);
-
-		closeModal();
-
-		reloadPageWithDelay();
-	}
-
-
-	function onConfirm(dataToSave) {
-
-		debugLog("confirmer");
-
-		// Filtrer les évaluations cochées
-		const evaluationsToSave = dataToSave.filter((data) => data.isChecked);
-
-		evaluationsToSave.forEach((evaluation) => {
-			delete evaluation.isChecked;
-			delete evaluation.status;
-		});
-
-		// Enregistrer les évaluations cochées
-		enregistrerEvaluationsDansIndexedDB(evaluationsToSave);
-
-		closeModal();
-
-		// Afficher immédiatement les changements apportés à la base de données
-		reloadPageWithDelay();
+			saveEvaluationsToIndexedDB(evaluationsToSave);
+			closeModal();
+			reloadPageWithDelay();
+		}
 	}
 
 
