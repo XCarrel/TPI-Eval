@@ -11,15 +11,19 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 
 - Tu ouvres cette page html dans ton navigateur préféré
   - Tape shift-F1 pour avoir de l'aide
-  - S'il y a un ou plusieurs fichiers 'eval*.js' dans le dossier, tu peux en recharger un grâce à la dropdown list
+  - S'il y a une ou plusieurs évaluations en cours (dans to local storage), tu peux en recharger une grâce à la dropdown list
   - Sinon tu peux partir sur une grille vierge
 - Tu remplis les champs grisés (les champs de justification sont extensibles)
 - Quand tu as un doute, tu cliques sur le numéro du critère ou tu presse shift-F1, et ... zbang!
-- Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Cela a pour effet de télécharger un fichier 'eval\<x>.js'. **Déplace ce fichier dans le dossier de TPI-Eval (remplace l'existant)**
-- Quand c'est fini, tu cliques 'finaliser', ça télécharge un ficher 'Eval TPI - \<candidat>.js et la met en lecture seule.
+- Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Il est stocké dans le local storage de ton navigateur
+- Quand c'est fini, tu cliques 'finaliser', ça la met en lecture seule.
 - Tu l'imprimes depuis le navigateur
 
 ## Astuces
+
+### Changement d'ordi ou de navigateur
+Si tu as besoin de changer de machine, tu fait "Exporter" et tu mets le contenu du fichier à la mano sous la clé "evals" dans le localstorage de l'autre ordi.  
+Mais fais gaffe: tu as deux copies de travail!
 
 ### Désactiver le message d’avertissement au téléchargement sur M$Edge
 Lancer [ce script](edgeAllowJs.reg)
