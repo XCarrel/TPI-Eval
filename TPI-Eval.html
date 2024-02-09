@@ -530,7 +530,8 @@
       <!-- ======================================================================================== -->
       <div class="row">
         <div id="cmdFreeze" class="button noprint">Finaliser</div>
-        <div id="cmdSave" class="button noprint">Enregistrer</div>
+        <div id="cmdSave" class="button noprint disabledbutton">Enregistrer</div>
+        <div id="cmdExport" class="button noprint">Exporter</div>
       </div>
     </div>
     <!-- The Modal popup, adapted from w3schools -->
@@ -1114,10 +1115,17 @@
       return res;
     }
 
-    // Save content to file
-    // This is the major (if not only) trick : the content is downloaded as js code that loads json in a variable
-    // The script 'eval.js' is referenced in the header
-    // To resume work on a saved sheet, you must move the downloaded file to the html page's directory and name it 'eval.js'
+    cmdExport.addEventListener("click", function () {
+      var dataStr = "data:text/json;charset=utf-8, " + encodeURIComponent(JSON.stringify(evals));
+      var downloadAnchorNode = document.createElement("a");
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "TPIEval_export.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    });
+
+    // Save content to local storage
     cmdSave.addEventListener("click", function () {
       saveData(false);
       cmdSave.classList.add("disabledbutton");
