@@ -1162,16 +1162,12 @@
       // add remarks
       data.remarks = txtRemarks.value;
 
-      // determine the file name
-      let filename = "Eval - unknown.js";
-      if (final) {
-        filename = "Eval TPI " + txtCandidate.value + ".js";
-      } else {
-        filename = `eval${1 + (dpdEvalSelector.value >= 0 ? parseInt(dpdEvalSelector.value) : evals.length)}.js`;
-      }
-
       // Store in localStorage
-      evals[currentIndex] = data;
+      if (currentIndex >= 0) {
+        evals[currentIndex] = data;
+      } else {
+        evals.push(data);
+      }
       localStorage.setItem("evals", JSON.stringify(evals));
     }
 
