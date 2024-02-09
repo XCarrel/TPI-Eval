@@ -22,8 +22,8 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 ## Astuces
 
 ### Changement d'ordi ou de navigateur
-Si tu as besoin de changer de machine, tu fait "Exporter" et tu mets le contenu du fichier à la mano sous la clé "evals" dans le localstorage de l'autre ordi.  
-Mais fais gaffe: tu as deux copies de travail!
+Si tu as besoin de changer de machine, tu fais "Exporter" et tu mets le contenu du fichier à la mano sous la clé "evals" dans le localstorage de l'autre ordi.  
+Mais fais gaffe: tu as deux copies de travail maintenant!
 
 ### Désactiver le message d’avertissement au téléchargement sur M$Edge
 Lancer [ce script](edgeAllowJs.reg)
