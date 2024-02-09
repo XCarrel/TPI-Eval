@@ -9,16 +9,6 @@
     <script>
       var evals = [];
     </script>
-    <script src="eval1.js"></script>
-    <script src="eval2.js"></script>
-    <script src="eval3.js"></script>
-    <script src="eval4.js"></script>
-    <script src="eval5.js"></script>
-    <script src="eval6.js"></script>
-    <script src="eval7.js"></script>
-    <script src="eval8.js"></script>
-    <script src="eval9.js"></script>
-    <script src="eval10.js"></script>
     <style>
       .text {
         margin: 2px;
@@ -554,7 +544,8 @@
   </body>
 
   <script>
-    // Build list of evals present in the directory
+    evals = JSON.parse(localStorage.getItem("evals"));
+    // Build dropdown list of evals
     evals.forEach(function (eval, i) {
       let opt = document.createElement("option");
       opt.innerText = eval.cartouche.candidate.name;
@@ -951,6 +942,9 @@
       isCloseable();
     }
 
+    window.addEventListener("keydown", function () {
+      cmdSave.classList.remove("disabledbutton");
+    });
     // propagate the candidate name in the sheet and workspace
     function contextualize() {
       spnCandidate.innerText = txtCandidate.value;
@@ -961,10 +955,12 @@
       contextualize();
     });
 
+    var currentIndex = -1; // Index of the eval selected. Remember for save
     dpdEvalSelector.addEventListener("change", function () {
       divSelector.className = "d-none";
       divPage.classList.remove("d-none");
-      load(evals[dpdEvalSelector.value]);
+      currentIndex = dpdEvalSelector.value;
+      load(evals[currentIndex]);
     });
 
     cmdEmpty.addEventListener("click", function () {
@@ -1124,6 +1120,7 @@
     // To resume work on a saved sheet, you must move the downloaded file to the html page's directory and name it 'eval.js'
     cmdSave.addEventListener("click", function () {
       saveData(false);
+      cmdSave.classList.add("disabledbutton");
     });
 
     function saveData(final, autosave = false) {
@@ -1173,14 +1170,9 @@
         filename = `eval${1 + (dpdEvalSelector.value >= 0 ? parseInt(dpdEvalSelector.value) : evals.length)}.js`;
       }
 
-      // and now save as downloaded json file
-      var dataStr = "data:text/json;charset=utf-8, evals.push(" + encodeURIComponent(JSON.stringify(data)) + ")";
-      var downloadAnchorNode = document.createElement("a");
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", filename);
-      document.body.appendChild(downloadAnchorNode);
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
+      // Store in localStorage
+      evals[currentIndex] = data;
+      localStorage.setItem("evals", JSON.stringify(evals));
     }
 
     // Handling of modal popup, from w3schools
