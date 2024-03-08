@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>TPI-Eval</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
     <script>
       var evals = [];
     </script>
@@ -547,12 +549,19 @@
   <script>
     evals = JSON.parse(localStorage.getItem("evals"));
     // Build dropdown list of evals
-    evals.forEach(function (eval, i) {
-      let opt = document.createElement("option");
-      opt.innerText = eval.cartouche.candidate.name;
-      opt.value = i;
-      dpdEvalSelector.appendChild(opt);
-    });
+    if (evals) {
+      evals.forEach(function (eval, i) {
+        let opt = document.createElement("option");
+        opt.innerText = eval.cartouche.candidate.name;
+        opt.value = i;
+        dpdEvalSelector.appendChild(opt);
+      });
+    } else {
+      evals = [];
+      divSelector.className = "d-none";
+      divPage.classList.remove("d-none");
+      isCloseable();
+    }
     var criteria = [
       {
         id: "A1",
