@@ -15,7 +15,8 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
   - Sinon tu peux partir sur une grille vierge
 - Tu remplis les champs grisés (les champs de justification sont extensibles)
 - Quand tu as un doute, tu cliques sur le numéro du critère ou tu presse shift-F1, et ... zbang!
-- Tu enregistre un état intermédiaire avec le bouton 'Enregistrer'. Il est stocké dans le local storage de ton navigateur
+- Tu enregistres un état intermédiaire avec le bouton 'Enregistrer'. Il est stocké dans le local storage de ton navigateur
+- Tu exportes un état intermédiaire avec le bouto 'Exporter', qui ne fait que télécharger un fichier .json avec le contenu du localstorage. C'est recommandé de faire ça de temps en temps, parce que suivant tes outils et pratiques, to localstorage peut très bien se faire zigouiller sans que tu ne le veuilles.
 - Quand c'est fini, tu cliques 'finaliser', ça la met en lecture seule.
 - Tu l'imprimes depuis le navigateur
 
@@ -24,6 +25,3 @@ Une page HTML sans dépendances externes qui permet de remplir la grille d'éval
 ### Changement d'ordi ou de navigateur
 Si tu as besoin de changer de machine, tu fais "Exporter" et tu mets le contenu du fichier à la mano sous la clé "evals" dans le localstorage de l'autre ordi.  
 Mais fais gaffe: tu as deux copies de travail maintenant!
-
-### Désactiver le message d’avertissement au téléchargement sur M$Edge
-Lancer [ce script](edgeAllowJs.reg)
