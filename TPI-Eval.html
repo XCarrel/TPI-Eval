@@ -1055,6 +1055,13 @@
           saveData(false);
         });
       }
+      // autoresize textareas
+      for (ta of document.getElementsByTagName("textarea")) {
+        ta.style.height = ta.scrollHeight + "px";
+        ta.addEventListener("blur", function () {
+          this.style.height = this.scrollHeight + "px";
+        });
+      }
     }
 
     // Add the remove buttons to all questions if there are more than 6 questions
@@ -1217,9 +1224,7 @@
 
     //Prevent accidental close/reload without saving...
     window.addEventListener("beforeunload", function (e) {
-      //Send default confirm popup
-      e.preventDefault();
-      e.returnValue = "";
+      saveData(false);
     });
   </script>
 </html>
