@@ -190,7 +190,6 @@
       <!-- ======================================================================================== -->
       <div class="row">
         <div id="cmdFreeze" class="button noprint">Finaliser</div>
-        <div id="cmdSave" class="button noprint disabledbutton">Enregistrer</div>
         <div id="cmdExport" class="button noprint">Exporter</div>
       </div>
       <!-- ======================================================================================== -->
@@ -952,9 +951,6 @@
       isCloseable();
     }
 
-    window.addEventListener("keydown", function () {
-      cmdSave.classList.remove("disabledbutton");
-    });
     // propagate the candidate name in the sheet and workspace
     function contextualize() {
       spnCandidate.innerText = txtCandidate.value;
@@ -991,7 +987,6 @@
       freezeInputs(document.getElementsByTagName("input"));
       freezeInputs(document.getElementsByTagName("textarea"));
       cmdFreeze.style.display = "none";
-      cmdSave.style.display = "none";
     }
 
     function freezeInputs(inputs) {
@@ -1053,6 +1048,13 @@
       contextualize();
 
       if (data.frozen) freezeSheet();
+
+      // autosave: call saveData upon change of any input or textarea field
+      for (input of document.querySelectorAll("input, textarea")) {
+        input.addEventListener("blur", function () {
+          saveData(false);
+        });
+      }
     }
 
     // Add the remove buttons to all questions if there are more than 6 questions
@@ -1132,12 +1134,6 @@
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
-    });
-
-    // Save content to local storage
-    cmdSave.addEventListener("click", function () {
-      saveData(false);
-      cmdSave.classList.add("disabledbutton");
     });
 
     function saveData(final, autosave = false) {
