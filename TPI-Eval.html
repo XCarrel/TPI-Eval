@@ -1221,10 +1221,5 @@
         modal.style.display = "none";
       }
     };
-
-    //Prevent accidental close/reload without saving...
-    window.addEventListener("beforeunload", function (e) {
-      saveData(false);
-    });
   </script>
 </html>
