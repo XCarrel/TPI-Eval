@@ -972,6 +972,12 @@
     cmdEmpty.addEventListener("click", function () {
       divSelector.className = "d-none";
       divPage.classList.remove("d-none");
+      // autosave: call saveData upon change of any input or textarea field
+      for (input of document.querySelectorAll("input, textarea")) {
+        input.addEventListener("blur", function () {
+          saveData(false);
+        });
+      }
       isCloseable();
     });
     // Finalize sheet by turning all inputs into their text value
