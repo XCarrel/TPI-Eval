@@ -546,6 +546,8 @@
   </body>
 
   <script>
+    setupAutosave(); // in case of white page (first use)
+
     evals = JSON.parse(localStorage.getItem("evals"));
     // Build dropdown list of evals
     if (evals) {
@@ -1052,20 +1054,23 @@
       txtRemarks.value = data.remarks;
 
       contextualize();
+      setupAutosave();
 
       if (data.frozen) freezeSheet();
-
-      // autosave: call saveData upon change of any input or textarea field
-      for (input of document.querySelectorAll("input, textarea")) {
-        input.addEventListener("blur", function () {
-          saveData(false);
-        });
-      }
       // autoresize textareas
       for (ta of document.getElementsByTagName("textarea")) {
         ta.style.height = ta.scrollHeight + "px";
         ta.addEventListener("blur", function () {
           this.style.height = this.scrollHeight + "px";
+        });
+      }
+    }
+
+    function setupAutosave() {
+      // autosave: call saveData upon change of any input or textarea field
+      for (input of document.querySelectorAll("input, textarea")) {
+        input.addEventListener("blur", function () {
+          saveData(false);
         });
       }
     }
